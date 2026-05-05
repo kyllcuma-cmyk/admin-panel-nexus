@@ -14,12 +14,8 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg-main); color: var(--text-main); font-family: var(--font-ui); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-        
-        /* Container Logic */
         .page-container { display: none; padding: 20px; flex: 1; flex-direction: column; }
         .page-container.active { display: flex; }
-
-        /* Login Page Styles */
         #pgLogin { align-items: center; justify-content: center; background: radial-gradient(circle at center, #18181b 0%, #09090b 100%); }
         .login-box { width: 100%; max-width: 380px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 32px 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .login-title { font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
@@ -32,39 +28,28 @@
         select.field-input option { background: #121214; color: var(--text-main); }
         .btn-auth { width: 100%; background: var(--accent); color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
         .btn-auth:hover { background: #08cceb; box-shadow: 0 0 16px rgba(6, 182, 212, 0.3); }
-
-        /* Dashboard Styles */
         .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; position: relative; }
         .menu-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 4px; display: flex; align-items: center; }
         .logo { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; margin: 0 auto; position: absolute; left: 50%; transform: translateX(-50%);}
         .logo span { color: var(--accent); }
         .sub { color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 24px; }
-        
-        /* Navigation Sidebar */
         .side-nav { position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; background: rgba(18, 18, 20, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 1px solid var(--border); z-index: 2000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 32px 24px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
         .side-nav.open { left: 0; }
         .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 1999; opacity: 0; pointer-events: none; transition: 0.3s; }
         .nav-overlay.open { opacity: 1; pointer-events: all; }
         .nav-close { position: absolute; top: 24px; right: 24px; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
         .nav-close:hover { color: var(--danger); }
-        
         .nav-item { padding: 16px 0; border-bottom: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; display: flex; align-items: center; gap: 8px;}
         .nav-item:hover { color: var(--text-main); padding-left: 8px; }
         .nav-item.active { color: var(--accent); border-bottom-color: var(--accent); }
-
         .dashboard-grid { display: flex; flex-direction: column; gap: 24px; max-width: 900px; margin: 0 auto; width: 100%; }
-        
-        /* View Switching Logic */
         .view-card { display: none; animation: fadeIn 0.4s ease; }
         .view-card.active { display: block; }
-
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
         .card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); color: var(--accent); text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;}
-        
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 12px 8px; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
         td { padding: 14px 8px; font-size: 0.8rem; border-bottom: 1px solid rgba(39, 39, 42, 0.5); vertical-align: middle; }
-        
         .mono { font-family: var(--font-mono); }
         .btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn:hover { background: var(--accent); color: #000; }
@@ -74,28 +59,21 @@
         .btn-edit:hover { background: #a1a1aa; color: #000; }
         .btn-cancel { border-color: var(--danger); color: var(--danger); }
         .btn-cancel:hover { background: var(--danger); color: #fff; }
-
         .btn-logout-dash { position: static; border-color: var(--border); color: var(--text-muted); padding: 6px 12px;}
         .btn-logout-dash:hover { border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
-
-        /* Toggle Switch */
         .toggle-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .3s; border-radius: 20px; }
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        /* Modal Elements */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.2s; }
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 360px; text-align: center; position: relative;}
         .m-input { width: 100%; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: var(--accent); font-family: var(--font-mono); font-size: 1.2rem; text-align: center; margin-bottom: 20px; outline: none; }
-        
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--success); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.8rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);}
         .toast.error { background: var(--danger); color: #fff; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
         @media (max-width: 600px) {
             table, thead, tbody, th, td, tr { display: block; }
             thead tr { display: none; }
@@ -112,7 +90,6 @@
         <div class="login-box">
             <div class="login-title">NEXUS<span>.CMD</span></div>
             <div class="login-sub">Secure Admin Portal</div>
-            
             <div class="field">
                 <label class="field-label">Admin ID</label>
                 <input class="field-input" type="text" id="adminUser" placeholder="Enter Administrator ID">
@@ -121,13 +98,11 @@
                 <label class="field-label">Passcode</label>
                 <input class="field-input" type="password" id="adminPass" placeholder="••••••••••••">
             </div>
-            
             <button class="btn-auth" onclick="doAdminLogin()">AUTHENTICATE</button>
         </div>
     </div>
 
     <div class="page-container" id="pgDash">
-        
         <div class="top-bar">
             <button class="menu-btn" onclick="toggleNav()">
                 <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -141,7 +116,6 @@
         <div class="side-nav" id="sideNav">
             <div class="nav-close" onclick="toggleNav()">✕</div>
             <div class="logo" style="margin-bottom: 40px; position: static; transform: none;">NEXUS<span>.CMD</span></div>
-            
             <div class="nav-item active" onclick="switchView('card-node', this)">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 Node Identity
@@ -161,7 +135,6 @@
         </div>
 
         <div class="dashboard-grid">
-            
             <div class="card view-card active" id="card-node">
                 <div class="card-title"><span>▶ Node Identity & Gas Fee</span></div>
                 <table>
@@ -199,7 +172,6 @@
                     <tbody id="affiliateBody"></tbody>
                 </table>
             </div>
-
         </div>
     </div>
 
@@ -237,11 +209,8 @@
                 <label class="field-label">E-Wallet / Bank & Nomor</label>
                 <div style="display: flex; gap: 8px;">
                     <select class="field-input" id="affBank" style="width: 45%; padding: 14px 8px; cursor: pointer;">
-                        <option value="DANA">DANA</option>
-                        <option value="OVO">OVO</option>
-                        <option value="GOPAY">GOPAY</option>
-                        <option value="SHOPEE">SHOPEE</option>
-                        <option value="SEABANK">SEABANK</option>
+                        <option value="DANA">DANA</option><option value="OVO">OVO</option><option value="GOPAY">GOPAY</option>
+                        <option value="SHOPEE">SHOPEE</option><option value="SEABANK">SEABANK</option>
                     </select>
                     <input class="field-input" type="number" id="affNumber" placeholder="08xxxxxxxx" style="width: 55%;">
                 </div>
@@ -265,11 +234,8 @@
                 <label class="field-label">E-Wallet / Bank & Nomor</label>
                 <div style="display: flex; gap: 8px;">
                     <select class="field-input" id="editAffBank" style="width: 45%; padding: 14px 8px; cursor: pointer;">
-                        <option value="DANA">DANA</option>
-                        <option value="OVO">OVO</option>
-                        <option value="GOPAY">GOPAY</option>
-                        <option value="SHOPEE">SHOPEE</option>
-                        <option value="SEABANK">SEABANK</option>
+                        <option value="DANA">DANA</option><option value="OVO">OVO</option><option value="GOPAY">GOPAY</option>
+                        <option value="SHOPEE">SHOPEE</option><option value="SEABANK">SEABANK</option>
                     </select>
                     <input class="field-input" type="number" id="editAffNumber" placeholder="08xxxxxxxx" style="width: 55%;">
                 </div>
@@ -287,7 +253,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // --- SISTEM LOGIN ADMIN ---
         const VALID_USER = "admin#1234";
         const VALID_PASS = "admin#superuser#1234";
 
@@ -302,30 +267,23 @@
         function doAdminLogin() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPass').value;
-            
             if (u === VALID_USER && p === VALID_PASS) {
                 localStorage.setItem("nexusAdminSession", "active");
                 document.getElementById('pgLogin').classList.remove('active');
                 document.getElementById('pgDash').classList.add('active');
-                initAdminSystem(); 
-                showToast("Access Granted");
-            } else {
-                showToast("Kredensial Admin Salah!", true);
-            }
+                initAdminSystem(); showToast("Access Granted");
+            } else { showToast("Kredensial Admin Salah!", true); }
         }
 
         function doAdminLogout() {
             localStorage.removeItem("nexusAdminSession");
-            document.getElementById('adminUser').value = '';
-            document.getElementById('adminPass').value = '';
-            document.getElementById('pgDash').classList.remove('active');
-            document.getElementById('pgLogin').classList.add('active');
+            document.getElementById('adminUser').value = ''; document.getElementById('adminPass').value = '';
+            document.getElementById('pgDash').classList.remove('active'); document.getElementById('pgLogin').classList.add('active');
             showToast("Logged out successfully");
         }
 
         window.onload = checkAuthSession;
 
-        // --- SISTEM SIDEBAR NAVIGASI ---
         function toggleNav() {
             document.getElementById('sideNav').classList.toggle('open');
             document.getElementById('navOverlay').classList.toggle('open');
@@ -334,14 +292,10 @@
         function switchView(viewId, el) {
             document.querySelectorAll('.view-card').forEach(c => c.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            
-            toggleNav();
+            el.classList.add('active'); toggleNav();
         }
 
-        // --- SISTEM FIREBASE & DASHBOARD ADMIN ---
         const firebaseConfig = {
             apiKey: "AIzaSyBPzA9mMwjuf1xfAqUi4wwqathrVFkF3-k",
             authDomain: "nexus-core-7f4ba.firebaseapp.com",
@@ -350,192 +304,76 @@
             messagingSenderId: "154178297804",
             appId: "1:154178297804:web:59fe7395352a351b3ec769"
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        let usersDataLocal = [];
-        let targetEditNode = "";
-        let confirmAction = null; 
+        firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+        let usersDataLocal = []; let targetEditNode = ""; let confirmAction = null; 
 
         function initAdminSystem() {
-            // LISTENER USER 
             db.collection('users').onSnapshot(snapshot => {
-                usersDataLocal = [];
-                snapshot.forEach(doc => usersDataLocal.push({ id: doc.id, ...doc.data() }));
-                renderUsers();
-            });
+                usersDataLocal = []; snapshot.forEach(doc => usersDataLocal.push({ id: doc.id, ...doc.data() })); renderUsers();
+            }); setInterval(renderUsers, 5000);
 
-            setInterval(renderUsers, 5000);
-
-            // LISTENER GAS FEE PROOFS 
             db.collection('gas_payments').where('status', '==', 'PENDING').onSnapshot(snapshot => {
-                const tbody = document.getElementById('gasBody');
-                tbody.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada bukti pembayaran baru.</td></tr>`;
-                    return;
-                }
-
+                const tbody = document.getElementById('gasBody'); tbody.innerHTML = '';
+                if (snapshot.empty) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada bukti pembayaran baru.</td></tr>`; return; }
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    tbody.innerHTML += `
-                        <tr>
-                            <td data-label="Node / User">
-                                <div class="td-content">
-                                    <div class="mono" style="font-weight:700; color:var(--text-main);">${data.node_id}</div>
-                                </div>
-                            </td>
-                            <td data-label="Email" style="color:var(--text-muted); font-size:0.75rem;">${data.email}</td>
-                            <td data-label="Bukti SS">
-                                <a href="${data.proof_url}" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold; background: var(--bg-input); padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;">Cek Foto</a>
-                            </td>
-                            <td data-label="Waktu" style="font-size:0.7rem; color: var(--text-muted);">${data.timestamp}</td>
-                            <td data-label="Action">
-                                <div style="display:flex; gap:6px; justify-content:flex-end;">
-                                    <button class="btn btn-success" onclick="promptApproveGas('${doc.id}', '${data.node_id}')">Approve</button>
-                                    <button class="btn btn-cancel" onclick="promptRejectGas('${doc.id}')">Tolak</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                    tbody.innerHTML += `<tr><td data-label="Node / User"><div class="td-content"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.node_id}</div></div></td><td data-label="Email" style="color:var(--text-muted); font-size:0.75rem;">${data.email}</td><td data-label="Bukti SS"><a href="${data.proof_url}" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold; background: var(--bg-input); padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;">Cek Foto</a></td><td data-label="Waktu" style="font-size:0.7rem; color: var(--text-muted);">${data.timestamp}</td><td data-label="Action"><div style="display:flex; gap:6px; justify-content:flex-end;"><button class="btn btn-success" onclick="promptApproveGas('${doc.id}', '${data.node_id}')">Approve</button><button class="btn btn-cancel" onclick="promptRejectGas('${doc.id}')">Tolak</button></div></td></tr>`;
                 });
             });
 
-            // LISTENER TRANSAKSI WD
             db.collection('transactions').onSnapshot(snapshot => {
-                const tbody = document.getElementById('txBody');
-                tbody.innerHTML = '';
-                let txList = [];
+                const tbody = document.getElementById('txBody'); tbody.innerHTML = ''; let txList = [];
                 snapshot.forEach(doc => { if (!doc.data().admin_cleared) txList.push({ id: doc.id, ...doc.data() }); });
-                
-                if (txList.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada transaksi dalam antrean.</td></tr>`;
-                    return;
-                }
-
+                if (txList.length === 0) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada transaksi dalam antrean.</td></tr>`; return; }
                 txList.sort((a, b) => b.tx_id - a.tx_id).forEach(data => {
                     const isPending = data.status === 'PENDING';
-                    tbody.innerHTML += `
-                        <tr>
-                            <td data-label="Node / Payer">
-                                <div class="td-content">
-                                    <div class="mono" style="font-weight:700; color:var(--text-main);">${data.node_id}</div>
-                                    <div style="font-size:0.65rem; color:var(--text-muted);">${data.name}</div>
-                                    <div class="mono" style="font-size:0.65rem; color:var(--text-muted);">${data.phone}</div>
-                                </div>
-                            </td>
-                            <td data-label="Detail (USD)">
-                                <div class="td-content">
-                                    <div class="mono" style="color:var(--accent); font-weight: 700;">$${(data.amount||0).toFixed(2)}</div>
-                                    <div style="font-size:0.65rem; color:var(--text-muted);">via ${data.method}</div>
-                                </div>
-                            </td>
-                            <td data-label="Status">${isPending ? '<span style="color:var(--warning); font-size: 0.7rem; font-weight: 700;">PENDING</span>' : '<span style="color:var(--success); font-size: 0.7rem; font-weight: 700;">SUCCESS</span>'}</td>
-                            <td data-label="Action">${isPending ? `<button class="btn btn-success" onclick="approveTx('${data.id}')">Approve WD</button>` : '<span style="font-size:0.7rem; color:var(--text-muted);">Completed</span>'}</td>
-                        </tr>
-                    `;
+                    tbody.innerHTML += `<tr><td data-label="Node / Payer"><div class="td-content"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.node_id}</div><div style="font-size:0.65rem; color:var(--text-muted);">${data.name}</div><div class="mono" style="font-size:0.65rem; color:var(--text-muted);">${data.phone}</div></div></td><td data-label="Detail (USD)"><div class="td-content"><div class="mono" style="color:var(--accent); font-weight: 700;">$${(data.amount||0).toFixed(2)}</div><div style="font-size:0.65rem; color:var(--text-muted);">via ${data.method}</div></div></td><td data-label="Status">${isPending ? '<span style="color:var(--warning); font-size: 0.7rem; font-weight: 700;">PENDING</span>' : '<span style="color:var(--success); font-size: 0.7rem; font-weight: 700;">SUCCESS</span>'}</td><td data-label="Action">${isPending ? `<button class="btn btn-success" onclick="approveTx('${data.id}')">Approve WD</button>` : '<span style="font-size:0.7rem; color:var(--text-muted);">Completed</span>'}</td></tr>`;
                 });
             });
 
-            // LISTENER DATA AFFILIATE
             db.collection('affiliates').onSnapshot(snapshot => {
-                const tbody = document.getElementById('affiliateBody');
-                if(!tbody) return;
-                tbody.innerHTML = '';
-                if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Belum ada afiliator terdaftar.</td></tr>';
-                    return;
-                }
+                const tbody = document.getElementById('affiliateBody'); if(!tbody) return; tbody.innerHTML = '';
+                if(snapshot.empty) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Belum ada afiliator terdaftar.</td></tr>'; return; }
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const safeName = data.name.replace(/'/g, "\\'");
-                    const safeWallet = data.wallet.replace(/'/g, "\\'");
+                    const safeName = data.name.replace(/'/g, "\\'"); const safeWallet = data.wallet.replace(/'/g, "\\'");
                     
+                    // --- TAMBAHAN LINK REFF OTOMATIS MUNCUL DI ADMIN ---
                     tbody.innerHTML += `
                         <tr>
                             <td data-label="Affiliator"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.name}</div></td>
-                            <td data-label="Kode Ref"><div class="mono" style="color:var(--accent); background:rgba(6,182,212,0.1); padding:4px 8px; border-radius:4px; display:inline-block; font-size: 0.8rem;">${data.code}</div></td>
+                            <td data-label="Kode Ref">
+                                <div class="mono" style="color:var(--accent); background:rgba(6,182,212,0.1); padding:4px 8px; border-radius:4px; display:inline-block; font-size: 0.8rem;">${data.code}</div>
+                                <div style="margin-top: 6px; font-size: 0.55rem; color: var(--text-muted); font-family: var(--font-mono); word-break: break-all;">
+                                    🔗 https://nexus-core-project.vercel.app/?ref=${data.code}
+                                </div>
+                            </td>
                             <td data-label="Rekening" style="color:var(--text-muted); font-size:0.75rem;">${data.wallet}</td>
                             <td data-label="Stats">
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--accent); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                        </svg>
-                                        ${data.total_downline || 0}
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--success); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                                        </svg>
-                                        ${data.total_gas_paid || 0}
-                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--accent); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>${data.total_downline || 0}</div>
+                                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--success); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>${data.total_gas_paid || 0}</div>
                                 </div>
                             </td>
-                            <td data-label="Action">
-                                <div style="display:flex; gap:6px; justify-content:flex-end;">
-                                    <button class="btn btn-edit" onclick="openEditAffiliate('${doc.id}', '${safeName}', '${safeWallet}')">Edit</button>
-                                    <button class="btn btn-cancel" onclick="promptDeleteAffiliate('${doc.id}', '${safeName}')">Hapus</button>
-                                </div>
-                            </td>
+                            <td data-label="Action"><div style="display:flex; gap:6px; justify-content:flex-end;"><button class="btn btn-edit" onclick="openEditAffiliate('${doc.id}', '${safeName}', '${safeWallet}')">Edit</button><button class="btn btn-cancel" onclick="promptDeleteAffiliate('${doc.id}', '${safeName}')">Hapus</button></div></td>
                         </tr>
                     `;
                 });
             });
         }
 
-        // --- UI & ACTION HELPERS ---
         function renderUsers() {
-            const tbody = document.getElementById('usersBody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            const now = Date.now();
-
+            const tbody = document.getElementById('usersBody'); if(!tbody) return; tbody.innerHTML = ''; const now = Date.now();
             usersDataLocal.forEach(data => {
-                const isChecked = data.has_paid_gas ? 'checked' : '';
-                const lastActive = data.last_active || 0;
-                const isOnline = (now - lastActive) < 20000; 
-                
-                tbody.innerHTML += `
-                    <tr>
-                        <td data-label="Node ID" class="mono" style="font-weight:600;">${data.id}</td>
-                        <td data-label="Status">${isOnline ? '<span style="color:var(--success); font-weight:700;">● Online</span>' : '<span style="color:var(--text-muted);">○ Offline</span>'}</td>
-                        <td data-label="Password" class="mono" style="color:var(--danger); font-size:0.75rem;">${data.password || 'N/A'}</td>
-                        <td data-label="Balance" class="mono" style="color:var(--success);">$${(data.balance || 0).toFixed(4)}</td>
-                        <td data-label="Gas Fee">
-                            <label class="toggle-switch">
-                                <input type="checkbox" ${isChecked} onchange="toggleGas('${data.id}', this.checked)">
-                                <span class="slider"></span>
-                            </label>
-                        </td>
-                        <td data-label="Action"><button class="btn btn-edit" onclick="openEditModal('${data.id}', ${data.balance || 0})">Edit</button></td>
-                    </tr>
-                `;
+                const isChecked = data.has_paid_gas ? 'checked' : ''; const isOnline = (now - (data.last_active || 0)) < 20000; 
+                tbody.innerHTML += `<tr><td data-label="Node ID" class="mono" style="font-weight:600;">${data.id}</td><td data-label="Status">${isOnline ? '<span style="color:var(--success); font-weight:700;">● Online</span>' : '<span style="color:var(--text-muted);">○ Offline</span>'}</td><td data-label="Password" class="mono" style="color:var(--danger); font-size:0.75rem;">${data.password || 'N/A'}</td><td data-label="Balance" class="mono" style="color:var(--success);">$${(data.balance || 0).toFixed(4)}</td><td data-label="Gas Fee"><label class="toggle-switch"><input type="checkbox" ${isChecked} onchange="toggleGas('${data.id}', this.checked)"><span class="slider"></span></label></td><td data-label="Action"><button class="btn btn-edit" onclick="openEditModal('${data.id}', ${data.balance || 0})">Edit</button></td></tr>`;
             });
         }
 
-        function showConfirm(title, desc, actionCallback) {
-            document.getElementById('confirmTitle').textContent = title;
-            document.getElementById('confirmDesc').textContent = desc;
-            confirmAction = actionCallback;
-            document.getElementById('confirmModal').classList.add('active');
-        }
+        function showConfirm(title, desc, actionCallback) { document.getElementById('confirmTitle').textContent = title; document.getElementById('confirmDesc').textContent = desc; confirmAction = actionCallback; document.getElementById('confirmModal').classList.add('active'); }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('active'); confirmAction = null; }
+        document.getElementById('confirmBtn').addEventListener('click', () => { if(confirmAction) confirmAction(); closeConfirmModal(); });
 
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-            confirmAction = null;
-        }
-
-        document.getElementById('confirmBtn').addEventListener('click', () => {
-            if(confirmAction) confirmAction();
-            closeConfirmModal();
-        });
-
-        // Modifikasi Approval Gas Fee (Terintegrasi Affiliate)
         function promptApproveGas(docId, nodeId) {
             showConfirm("Verifikasi Gas Fee", `Aktifkan Gas Fee untuk Node [${nodeId}]?`, () => {
                 db.collection('gas_payments').doc(docId).update({ status: 'APPROVED' }).then(() => {
@@ -545,11 +383,7 @@
                             showToast(`Gas Fee diverifikasi!`);
                             if(userData && userData.referral_code) {
                                 db.collection('affiliates').where('code', '==', userData.referral_code).get().then(refSnap => {
-                                    if(!refSnap.empty) {
-                                        db.collection('affiliates').doc(refSnap.docs[0].id).update({
-                                            total_gas_paid: firebase.firestore.FieldValue.increment(1)
-                                        });
-                                    }
+                                    if(!refSnap.empty) { db.collection('affiliates').doc(refSnap.docs[0].id).update({ total_gas_paid: firebase.firestore.FieldValue.increment(1) }); }
                                 });
                             }
                         });
@@ -558,114 +392,39 @@
             });
         }
 
-        function promptRejectGas(docId) {
-            showConfirm("Tolak Pembayaran", `Tolak dan hapus bukti SS ini dari daftar antrean?`, () => {
-                db.collection('gas_payments').doc(docId).update({ status: 'REJECTED' }).then(() => showToast('Bukti pembayaran ditolak.', true));
-            });
-        }
-
-        function promptClearTx() {
-            showConfirm("Bersihkan Riwayat", "Sembunyikan semua riwayat SUCCESS dari panel admin?", () => {
-                db.collection('transactions').where('status', '==', 'SUCCESS').get().then(snap => { 
-                    if(snap.empty) return showToast("Tidak ada data untuk dibersihkan", true);
-                    let b = db.batch(); 
-                    snap.forEach(d => b.update(d.ref, { admin_cleared: true })); 
-                    b.commit().then(() => showToast("Riwayat panel admin dibersihkan")); 
-                });
-            });
-        }
-
-        // --- MODAL ADD AFFILIATE ---
+        function promptRejectGas(docId) { showConfirm("Tolak Pembayaran", `Tolak dan hapus bukti SS ini dari daftar antrean?`, () => { db.collection('gas_payments').doc(docId).update({ status: 'REJECTED' }).then(() => showToast('Bukti pembayaran ditolak.', true)); }); }
+        function promptClearTx() { showConfirm("Bersihkan Riwayat", "Sembunyikan semua riwayat SUCCESS dari panel admin?", () => { db.collection('transactions').where('status', '==', 'SUCCESS').get().then(snap => { if(snap.empty) return showToast("Tidak ada data untuk dibersihkan", true); let b = db.batch(); snap.forEach(d => b.update(d.ref, { admin_cleared: true })); b.commit().then(() => showToast("Riwayat panel admin dibersihkan")); }); }); }
         function openAddAffiliate() { document.getElementById('addAffiliateModal').classList.add('active'); }
         function closeAddAffiliate() { document.getElementById('addAffiliateModal').classList.remove('active'); }
         
         function saveAffiliate() {
-            const name = document.getElementById('affName').value;
-            const bank = document.getElementById('affBank').value;
-            const number = document.getElementById('affNumber').value;
-            
+            const name = document.getElementById('affName').value; const bank = document.getElementById('affBank').value; const number = document.getElementById('affNumber').value;
             if(!name || !number) return showToast("Semua data wajib diisi!", true);
-            
-            // Gabungkan Nama Bank dan Nomor Rekening
-            const walletStr = bank + " - " + number;
-            const code = "NEXUS-" + Math.random().toString(36).substring(2, 7).toUpperCase();
-            
-            db.collection('affiliates').add({
-                name: name,
-                wallet: walletStr, 
-                code: code,
-                total_downline: 0,
-                total_gas_paid: 0,
-                created_at: Date.now()
-            }).then(() => {
-                showToast("Affiliator berhasil ditambahkan!");
-                document.getElementById('affName').value = '';
-                document.getElementById('affNumber').value = '';
-                closeAddAffiliate();
-            });
+            const walletStr = bank + " - " + number; const code = "NEXUS-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+            db.collection('affiliates').add({ name: name, wallet: walletStr, code: code, total_downline: 0, total_gas_paid: 0, created_at: Date.now() }).then(() => { showToast("Affiliator berhasil ditambahkan!"); document.getElementById('affName').value = ''; document.getElementById('affNumber').value = ''; closeAddAffiliate(); });
         }
 
-        // --- MODAL EDIT & DELETE AFFILIATE ---
         function openEditAffiliate(id, name, walletStr) {
-            document.getElementById('editAffId').value = id;
-            document.getElementById('editAffName').value = name;
-            
+            document.getElementById('editAffId').value = id; document.getElementById('editAffName').value = name;
             let parts = walletStr.split(" - ");
-            if(parts.length === 2) {
-                document.getElementById('editAffBank').value = parts[0];
-                document.getElementById('editAffNumber').value = parts[1];
-            } else {
-                document.getElementById('editAffNumber').value = walletStr;
-            }
+            if(parts.length === 2) { document.getElementById('editAffBank').value = parts[0]; document.getElementById('editAffNumber').value = parts[1]; } else { document.getElementById('editAffNumber').value = walletStr; }
             document.getElementById('editAffiliateModal').classList.add('active');
         }
-
-        function closeEditAffiliate() {
-            document.getElementById('editAffiliateModal').classList.remove('active');
-        }
-
+        function closeEditAffiliate() { document.getElementById('editAffiliateModal').classList.remove('active'); }
         function updateAffiliate() {
-            const id = document.getElementById('editAffId').value;
-            const name = document.getElementById('editAffName').value;
-            const bank = document.getElementById('editAffBank').value;
-            const number = document.getElementById('editAffNumber').value;
-            
+            const id = document.getElementById('editAffId').value; const name = document.getElementById('editAffName').value; const bank = document.getElementById('editAffBank').value; const number = document.getElementById('editAffNumber').value;
             if(!name || !number) return showToast("Semua data wajib diisi!", true);
-            
             const walletStr = bank + " - " + number;
-            
-            db.collection('affiliates').doc(id).update({
-                name: name,
-                wallet: walletStr
-            }).then(() => {
-                showToast("Data affiliator diperbarui!");
-                closeEditAffiliate();
-            });
+            db.collection('affiliates').doc(id).update({ name: name, wallet: walletStr }).then(() => { showToast("Data affiliator diperbarui!"); closeEditAffiliate(); });
         }
+        function promptDeleteAffiliate(id, name) { showConfirm("Hapus Affiliator", `Yakin ingin menghapus partner ${name}? Data tidak dapat dikembalikan.`, () => { db.collection('affiliates').doc(id).delete().then(() => { showToast("Affiliator berhasil dihapus!"); }); }); }
 
-        function promptDeleteAffiliate(id, name) {
-            showConfirm("Hapus Affiliator", `Yakin ingin menghapus partner ${name}? Data tidak dapat dikembalikan.`, () => {
-                db.collection('affiliates').doc(id).delete().then(() => {
-                    showToast("Affiliator berhasil dihapus!");
-                });
-            });
-        }
-
-        // --- UTILS ---
         function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("Status Gas Fee Diperbarui")); }
         function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("Withdrawal Disetujui")); }
-        
         function openEditModal(id, bal) { targetEditNode = id; document.getElementById('editNodeLabel').textContent = `Target: ${id}`; document.getElementById('editAmount').value = bal; document.getElementById('editModal').classList.add('active'); }
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
         function saveNewBalance() { const val = parseFloat(document.getElementById('editAmount').value); db.collection('users').doc(targetEditNode).update({ balance: val }).then(() => { showToast("Saldo Diperbarui"); closeEditModal(); }); }
-        
-        function showToast(msg, isError = false) { 
-            const t = document.getElementById('toastEl'); 
-            t.textContent = msg; 
-            if(isError) t.classList.add('error'); else t.classList.remove('error');
-            t.classList.add('show'); 
-            setTimeout(() => t.classList.remove('show'), 3000); 
-        }
+        function showToast(msg, isError = false) { const t = document.getElementById('toastEl'); t.textContent = msg; if(isError) t.classList.add('error'); else t.classList.remove('error'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
     </script>
 </body>
 </html>
