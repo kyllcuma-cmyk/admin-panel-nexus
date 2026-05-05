@@ -259,26 +259,78 @@
             font-size: 0.6rem; margin-top: 4px; opacity: 0.7; text-align: right; font-family: var(--font-mono);
         }
 
-        /* Notifikasi Atas Lebar & Elegan */
+        /* --- DYNAMIC ISLAND NOTIFICATION (NEW ELEGANT DESIGN) --- */
         .toast {
-            position: fixed; top: 0; left: 50%;
-            transform: translateX(-50%) translateY(-100%);
-            width: 90%; max-width: 600px;
-            background: rgba(24, 24, 27, 0.85);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border); border-top: none;
-            border-bottom: 2px solid var(--success);
-            border-radius: 0 0 12px 12px;
-            color: var(--text-main); padding: 16px 24px;
-            font-family: var(--font-mono); font-weight: 700;
-            font-size: 0.85rem; text-align: center;
-            letter-spacing: 1px; text-transform: uppercase;
-            opacity: 0; pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #000; /* Pure Black Apple Style */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.05);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10000;
+            max-width: 36px; /* Initial circle size */
+            height: 36px;
+            overflow: hidden;
+            white-space: nowrap;
         }
-        .toast.error { border-bottom-color: var(--danger); color: var(--danger); }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            padding: 6px 16px 6px 6px;
+            gap: 12px;
+            max-width: 400px; /* Expands to fit text */
+            height: 42px;
+        }
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #111;
+            flex-shrink: 0;
+            transition: 0.3s ease;
+        }
+        .toast-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2.5;
+        }
+        .toast:not(.error) .toast-icon {
+            color: var(--accent);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+        }
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.15);
+        }
+        .toast.error .toast-icon {
+            color: var(--danger);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+        .toast-text {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.4s ease 0.1s; /* Delay text fade in */
+        }
+        .toast.show .toast-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
         @media (max-width: 600px) {
             table, thead, tbody, th, td, tr { display: block; }
@@ -525,7 +577,10 @@
         </div>
     </div>
 
-    <div class="toast" id="toastEl">ACTION SUCCESSFUL</div>
+    <div class="toast" id="toastEl">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-text" id="toastText">System Initialized</div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
@@ -563,10 +618,10 @@
                 document.getElementById('pgLogin').classList.remove('active');
                 document.getElementById('pgDash').classList.add('active');
                 initAdminSystem(); 
-                showToast("ACCESS GRANTED");
+                showToast("Access Granted");
                 notifSound.play().catch(e=>{}); 
             } else {
-                showToast("KREDENSIAL ADMIN SALAH", true);
+                showToast("Invalid Credentials", true);
             }
         }
 
@@ -576,7 +631,7 @@
             document.getElementById('adminPass').value = '';
             document.getElementById('pgDash').classList.remove('active');
             document.getElementById('pgLogin').classList.add('active');
-            showToast("LOGGED OUT SUCCESSFULLY");
+            showToast("Session Terminated");
         }
 
         window.onload = checkAuthSession;
@@ -646,10 +701,9 @@
                 let currentGas = snapshot.size;
                 updateBadge('badge-gas', currentGas);
 
-                // Eksekusi sound dan memunculkan banner top-toast
                 if (prevGasCount !== -1 && currentGas > prevGasCount) {
                     playNotifSound();
-                    showToast("SYSTEM: NEW GAS FEE PENDING");
+                    showToast("New Gas Fee Pending");
                 }
                 prevGasCount = currentGas;
                 
@@ -699,10 +753,9 @@
                 // UPDATE BADGE WD
                 updateBadge('badge-wd', pendingWdCount);
 
-                // Eksekusi sound dan memunculkan banner top-toast
                 if (prevWdCount !== -1 && pendingWdCount > prevWdCount) {
                     playNotifSound();
-                    showToast("SYSTEM: NEW WITHDRAWAL REQUEST");
+                    showToast("New Withdrawal Request");
                 }
                 prevWdCount = pendingWdCount;
 
@@ -891,10 +944,9 @@
                 // UPDATE BADGE PESAN BELUM DIBALAS
                 updateBadge('badge-msg', unreadCount);
 
-                // Eksekusi sound dan memunculkan banner top-toast
                 if (prevMsgCount !== -1 && unreadCount > prevMsgCount) {
                     playNotifSound();
-                    showToast("SYSTEM: INCOMING SUPPORT MESSAGE");
+                    showToast("Incoming Support Message");
                 }
                 prevMsgCount = unreadCount;
             });
@@ -902,11 +954,11 @@
 
         // --- SISTEM PEMBAYARAN GAJI AFFILIATOR ---
         function promptPaySalary(id, name, amount) {
-            if(amount <= 0) return showToast("TIDAK ADA GAJI PENDING", true);
+            if(amount <= 0) return showToast("No Pending Salary", true);
             const formatted = "Rp " + amount.toLocaleString('id-ID');
             showConfirm("Konfirmasi Pembayaran", `Tandai sudah dibayar ${formatted} ke rekening partner [${name}]?`, () => {
                 db.collection('affiliates').doc(id).update({ unpaid_commission: 0 }).then(() => {
-                    showToast(`GAJI PARTNER SELESAI`);
+                    showToast(`Salary Cleared`);
                 });
             });
         }
@@ -978,7 +1030,7 @@
                 area.scrollTop = area.scrollHeight;
             }).catch(e => {
                 console.error("Gagal mengirim pesan:", e);
-                showToast("GAGAL MENGIRIM BALASAN", true);
+                showToast("Failed to send message", true);
             });
         }
 
@@ -986,7 +1038,7 @@
             if(!activeChatNode) return;
             showConfirm("Selesaikan Percakapan", `Tandai selesai dan hapus seluruh riwayat pesan dengan Node [${activeChatNode}]?`, () => {
                 db.collection('chats').doc(activeChatNode).delete().then(() => {
-                    showToast("SESI CS SELESAI");
+                    showToast("Session Resolved");
                     closeAdminChat();
                 });
             });
@@ -996,9 +1048,9 @@
         // --- UI & ACTION HELPERS ---
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                showToast("LINK REFERAL DISALIN");
+                showToast("Link Copied to Clipboard");
             }).catch(err => {
-                showToast("GAGAL MENYALIN LINK", true);
+                showToast("Failed to copy link", true);
             });
         }
 
@@ -1053,7 +1105,7 @@
                     db.collection('users').doc(nodeId).get().then(userSnap => {
                         let userData = userSnap.data();
                         db.collection('users').doc(nodeId).update({ has_paid_gas: true }).then(() => {
-                            showToast(`GAS FEE VERIFIED`);
+                            showToast(`Gas Fee Verified`);
                             if(userData && userData.referral_code) {
                                 db.collection('affiliates').where('code', '==', userData.referral_code).get().then(refSnap => {
                                     if(!refSnap.empty) {
@@ -1072,17 +1124,17 @@
 
         function promptRejectGas(docId) {
             showConfirm("Tolak Pembayaran", `Tolak dan hapus bukti SS ini dari daftar antrean?`, () => {
-                db.collection('gas_payments').doc(docId).update({ status: 'REJECTED' }).then(() => showToast('BUKTI DITOLAK', true));
+                db.collection('gas_payments').doc(docId).update({ status: 'REJECTED' }).then(() => showToast('Payment Rejected', true));
             });
         }
 
         function promptClearTx() {
             showConfirm("Bersihkan Riwayat", "Sembunyikan semua riwayat SUCCESS dari panel admin?", () => {
                 db.collection('transactions').where('status', '==', 'SUCCESS').get().then(snap => { 
-                    if(snap.empty) return showToast("DATA KOSONG", true);
+                    if(snap.empty) return showToast("No Data to Clear", true);
                     let b = db.batch(); 
                     snap.forEach(d => b.update(d.ref, { admin_cleared: true })); 
-                    b.commit().then(() => showToast("RIWAYAT DIBERSIHKAN")); 
+                    b.commit().then(() => showToast("History Cleared")); 
                 });
             });
         }
@@ -1096,7 +1148,7 @@
             const bank = document.getElementById('affBank').value;
             const number = document.getElementById('affNumber').value;
             
-            if(!name || !number) return showToast("DATA WAJIB DIISI", true);
+            if(!name || !number) return showToast("Missing Fields", true);
             
             const walletStr = bank + " - " + number;
             const code = "NEXUS-" + Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -1110,7 +1162,7 @@
                 unpaid_commission: 0,
                 created_at: Date.now()
             }).then(() => {
-                showToast("AFFILIATOR DITAMBAHKAN");
+                showToast("Affiliate Registered");
                 document.getElementById('affName').value = '';
                 document.getElementById('affNumber').value = '';
                 closeAddAffiliate();
@@ -1142,7 +1194,7 @@
             const bank = document.getElementById('editAffBank').value;
             const number = document.getElementById('editAffNumber').value;
             
-            if(!name || !number) return showToast("DATA WAJIB DIISI", true);
+            if(!name || !number) return showToast("Missing Fields", true);
             
             const walletStr = bank + " - " + number;
             
@@ -1150,7 +1202,7 @@
                 name: name,
                 wallet: walletStr
             }).then(() => {
-                showToast("DATA DIPERBARUI");
+                showToast("Data Updated");
                 closeEditAffiliate();
             });
         }
@@ -1158,14 +1210,14 @@
         function promptDeleteAffiliate(id, name) {
             showConfirm("Hapus Affiliator", `Yakin ingin menghapus partner ${name}? Data tidak dapat dikembalikan.`, () => {
                 db.collection('affiliates').doc(id).delete().then(() => {
-                    showToast("AFFILIATOR DIHAPUS");
+                    showToast("Affiliate Deleted");
                 });
             });
         }
 
         // --- UTILS ---
-        function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("GAS FEE DIPERBARUI")); }
-        function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("WITHDRAWAL DISETUJUI")); }
+        function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("Gas Fee Updated")); }
+        function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("Withdrawal Approved")); }
         
         function openEditModal(id, bal) { 
             targetEditNode = id;
@@ -1177,21 +1229,37 @@
         function saveNewBalance() { 
             const val = parseFloat(document.getElementById('editAmount').value);
             db.collection('users').doc(targetEditNode).update({ balance: val }).then(() => { 
-                showToast("SALDO DIPERBARUI"); 
+                showToast("Balance Overwritten"); 
                 closeEditModal(); 
             });
         }
         
+        // --- DYNAMIC ISLAND TOAST LOGIC ---
         function showToast(msg, isError = false) { 
             const t = document.getElementById('toastEl');
-            t.textContent = msg; 
+            const iconEl = document.getElementById('toastIcon');
+            const textEl = document.getElementById('toastText');
+            
+            // Set Text
+            textEl.textContent = msg; 
+            
+            // Set SVG Icon based on state (NO EMOJI)
             if(isError) {
                 t.classList.add('error'); 
+                iconEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
             } else {
                 t.classList.remove('error');
+                // Nexus/Sparkle Icon
+                iconEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
             }
+            
+            // Trigger Animation
             t.classList.add('show'); 
-            setTimeout(() => t.classList.remove('show'), 3000);
+            
+            if(window.toastTimer) clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                t.classList.remove('show');
+            }, 3500); // 3.5 seconds
         }
     </script>
 </body>
