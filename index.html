@@ -209,6 +209,22 @@
             border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.1); 
         }
 
+        /* Toggle Switch */
+        .toggle-switch { 
+            position: relative; display: inline-block; width: 40px; height: 20px; 
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; 
+            bottom: 0; background-color: var(--border); transition: .3s; border-radius: 20px;
+        }
+        .slider:before { 
+            position: absolute; content: ""; height: 12px; width: 12px; 
+            left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; 
+        }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
         /* Modal Elements */
         .modal-overlay { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
@@ -243,14 +259,25 @@
             font-size: 0.6rem; margin-top: 4px; opacity: 0.7; text-align: right; font-family: var(--font-mono);
         }
 
-        .toast { 
-            position: fixed; bottom: 20px; left: 50%; 
-            transform: translateX(-50%) translateY(20px); background: var(--success); 
-            color: #000; padding: 12px 20px; border-radius: 8px; font-weight: 600; 
-            font-size: 0.85rem; opacity: 0; pointer-events: none; transition: 0.3s; 
-            z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); text-align: center;
+        /* Notifikasi Atas Lebar & Elegan */
+        .toast {
+            position: fixed; top: 0; left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            width: 90%; max-width: 600px;
+            background: rgba(24, 24, 27, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border); border-top: none;
+            border-bottom: 2px solid var(--success);
+            border-radius: 0 0 12px 12px;
+            color: var(--text-main); padding: 16px 24px;
+            font-family: var(--font-mono); font-weight: 700;
+            font-size: 0.85rem; text-align: center;
+            letter-spacing: 1px; text-transform: uppercase;
+            opacity: 0; pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .toast.error { background: var(--danger); color: #fff; }
+        .toast.error { border-bottom-color: var(--danger); color: var(--danger); }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         @media (max-width: 600px) {
@@ -498,37 +525,19 @@
         </div>
     </div>
 
-    <div class="toast" id="toastEl">Action Successful</div>
+    <div class="toast" id="toastEl">ACTION SUCCESSFUL</div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // --- SISTEM NOTIFIKASI IPHONE & AUDIO ---
-        const iphoneSound = new Audio('https://raw.githubusercontent.com/Anand-Giri/Sound-Effects-Assets/main/iphone_notification.mp3');
-        
-        function requestPushPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission();
-            }
+        // --- SISTEM SUARA NOTIFIKASI BARU ---
+        const notifSound = new Audio('https://mp3tourl.com/audio/1777999427628-52e4e45a-fc07-4f51-bd99-14077cd994dd.mp3');
+        function playNotifSound() {
+            notifSound.play().catch(e => console.log("Audio diblokir browser, klik layarnya dulu."));
         }
 
-        function triggerNotification(title, message) {
-            // 1. Bunyikan Suara iPhone
-            iphoneSound.play().catch(e => console.log("Audio diblokir browser, klik layar dulu."));
-            
-            // 2. Munculkan Pop-up Toast Web
-            showToast(`${title}: ${message}`);
-
-            // 3. Munculkan Push Notif Sistem (HP/Desktop)
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(title, {
-                    body: message,
-                    icon: "https://cdn-icons-png.flaticon.com/512/1828/1828104.png"
-                });
-            }
-        }
-
+        // Variabel pelacak badge untuk membunyikan suara hanya jika jumlahnya naik
         let prevGasCount = -1;
         let prevWdCount = -1;
         let prevMsgCount = -1;
@@ -541,7 +550,6 @@
             if (localStorage.getItem("nexusAdminSession") === "active") {
                 document.getElementById('pgLogin').classList.remove('active');
                 document.getElementById('pgDash').classList.add('active');
-                requestPushPermission();
                 initAdminSystem(); 
             }
         }
@@ -554,15 +562,11 @@
                 localStorage.setItem("nexusAdminSession", "active");
                 document.getElementById('pgLogin').classList.remove('active');
                 document.getElementById('pgDash').classList.add('active');
-                
-                requestPushPermission();
                 initAdminSystem(); 
-                showToast("Access Granted");
-                
-                // Unlock audio policy
-                iphoneSound.play().catch(e=>{}); 
+                showToast("ACCESS GRANTED");
+                notifSound.play().catch(e=>{}); 
             } else {
-                showToast("Kredensial Admin Salah!", true);
+                showToast("KREDENSIAL ADMIN SALAH", true);
             }
         }
 
@@ -572,7 +576,7 @@
             document.getElementById('adminPass').value = '';
             document.getElementById('pgDash').classList.remove('active');
             document.getElementById('pgLogin').classList.add('active');
-            showToast("Logged out successfully");
+            showToast("LOGGED OUT SUCCESSFULLY");
         }
 
         window.onload = checkAuthSession;
@@ -593,6 +597,7 @@
             toggleNav();
         }
 
+        // --- HELPER UNTUK UPDATE BADGE ---
         function updateBadge(badgeId, count) {
             const badge = document.getElementById(badgeId);
             if (badge) {
@@ -641,8 +646,10 @@
                 let currentGas = snapshot.size;
                 updateBadge('badge-gas', currentGas);
 
+                // Eksekusi sound dan memunculkan banner top-toast
                 if (prevGasCount !== -1 && currentGas > prevGasCount) {
-                    triggerNotification("Peringatan Gas Fee", "Ada bukti pembayaran baru masuk!");
+                    playNotifSound();
+                    showToast("SYSTEM: NEW GAS FEE PENDING");
                 }
                 prevGasCount = currentGas;
                 
@@ -689,10 +696,13 @@
                     if (data.status === 'PENDING') pendingWdCount++;
                 });
                 
+                // UPDATE BADGE WD
                 updateBadge('badge-wd', pendingWdCount);
 
+                // Eksekusi sound dan memunculkan banner top-toast
                 if (prevWdCount !== -1 && pendingWdCount > prevWdCount) {
-                    triggerNotification("Penarikan Aset", "Permintaan Withdraw baru perlu verifikasi.");
+                    playNotifSound();
+                    showToast("SYSTEM: NEW WITHDRAWAL REQUEST");
                 }
                 prevWdCount = pendingWdCount;
 
@@ -752,20 +762,37 @@
 
                     if (unpaidComm > 0) pendingSalaryCount++;
 
+                    // TABEL AFFILIATE NETWORK
                     tbodyAff.innerHTML += `
                         <tr>
                             <td data-label="Affiliator"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.name}</div></td>
                             <td data-label="Kode Ref">
                                 <div class="td-content" style="align-items: flex-start; text-align: left;">
                                     <div class="mono" style="color:var(--accent); background:rgba(6,182,212,0.1); padding:4px 8px; border-radius:4px; display:inline-block; font-size: 0.8rem; margin-bottom: 6px;">${data.code}</div>
-                                    <div style="font-size: 0.65rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer;" onclick="copyToClipboard('${refLink}')">Salin Link</div>
+                                    <div style="font-size: 0.65rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;" onclick="copyToClipboard('${refLink}')" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        Salin Link
+                                    </div>
                                 </div>
                             </td>
                             <td data-label="Rekening" style="color:var(--text-muted); font-size:0.75rem;">${data.wallet}</td>
                             <td data-label="Stats">
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                    <div style="color: var(--accent); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">D: ${data.total_downline || 0}</div>
-                                    <div style="color: var(--success); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">G: ${data.total_gas_paid || 0}</div>
+                                    <div title="Total Downline" style="display: flex; align-items: center; gap: 6px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--accent); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="9" cy="7" r="4"></circle>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        </svg>
+                                        ${data.total_downline || 0}
+                                    </div>
+                                    <div title="Total Gas Paid" style="display: flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--success); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                        </svg>
+                                        ${data.total_gas_paid || 0}
+                                    </div>
                                 </div>
                             </td>
                             <td data-label="Action">
@@ -777,6 +804,7 @@
                         </tr>
                     `;
 
+                    // TABEL GAJI AFFILIATOR
                     tbodySal.innerHTML += `
                         <tr>
                             <td data-label="Affiliator"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.name}</div></td>
@@ -788,13 +816,17 @@
                             </td>
                             <td data-label="Action">
                                 <div style="display:flex; justify-content:flex-end;">
-                                    <button class="btn ${unpaidComm > 0 ? 'btn-success' : 'btn-edit'}" ${unpaidComm <= 0 ? 'disabled style="opacity:0.5;"' : `onclick="promptPaySalary('${doc.id}', '${safeName}', ${unpaidComm})"`}>Sudah Bayar</button>
+                                    <button class="btn ${unpaidComm > 0 ? 'btn-success' : 'btn-edit'}" ${unpaidComm <= 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : `onclick="promptPaySalary('${doc.id}', '${safeName}', ${unpaidComm})"`}>
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        Sudah Bayar
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                     `;
                 });
                 
+                // UPDATE BADGE GAJI AFFILIATOR
                 updateBadge('badge-salary', pendingSalaryCount);
             });
 
@@ -806,7 +838,10 @@
                 
                 let unreadCount = 0; 
                 let chats = [];
-                snapshot.forEach(doc => { chats.push({ id: doc.id, ...doc.data() }); });
+                
+                snapshot.forEach(doc => {
+                    chats.push({ id: doc.id, ...doc.data() });
+                });
                 
                 if(chats.length === 0) {
                     updateBadge('badge-msg', 0);
@@ -814,40 +849,52 @@
                     return;
                 }
                 
+                // Urutkan berdasarkan waktu terakhir update
                 chats.sort((a, b) => b.updated_at - a.updated_at).forEach(data => {
                     const msgs = data.messages || [];
                     const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
                     const lastText = lastMsg ? lastMsg.text : '';
                     
-                    if (lastMsg && lastMsg.sender === 'user') unreadCount++;
+                    if (lastMsg && lastMsg.sender === 'user') {
+                        unreadCount++;
+                    }
                     
                     let timeStr = '';
                     if (data.updated_at) {
                         const date = new Date(data.updated_at);
-                        timeStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        timeStr = `${hours}:${minutes}`;
                     }
 
+                    // Tambahkan highlight kuning jika pesan belum dibalas
                     const isUnread = (lastMsg && lastMsg.sender === 'user');
                     const rowStyle = isUnread ? 'border-left: 3px solid var(--warning); background: rgba(245, 158, 11, 0.05);' : '';
 
                     tbody.innerHTML += `
                         <tr style="${rowStyle}">
                             <td data-label="Node ID" class="mono" style="font-weight:700; color:var(--accent);">${data.id}</td>
-                            <td data-label="Pesan Terakhir" style="color:${isUnread ? 'var(--text-main)' : 'var(--text-muted)'}; font-size:0.75rem;">${lastText}</td>
-                            <td data-label="Waktu" style="font-size:0.7rem; color:var(--text-muted);">${timeStr}</td>
+                            <td data-label="Pesan Terakhir" style="color:${isUnread ? 'var(--text-main)' : 'var(--text-muted)'}; font-size:0.75rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: ${isUnread ? '700' : 'normal'};">${lastText}</td>
+                            <td data-label="Waktu" style="font-size:0.7rem; color:var(--text-muted); font-family: var(--font-mono);">${timeStr}</td>
                             <td data-label="Action">
                                 <div style="display:flex; justify-content:flex-end;">
-                                    <button class="btn ${isUnread ? 'btn-success' : 'btn-edit'}" onclick="openAdminChat('${data.id}')">Balas</button>
+                                    <button class="btn ${isUnread ? 'btn-success' : 'btn-edit'}" style="display: flex; align-items: center; gap: 4px;" onclick="openAdminChat('${data.id}')">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                        Balas
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                     `;
                 });
 
+                // UPDATE BADGE PESAN BELUM DIBALAS
                 updateBadge('badge-msg', unreadCount);
 
+                // Eksekusi sound dan memunculkan banner top-toast
                 if (prevMsgCount !== -1 && unreadCount > prevMsgCount) {
-                    triggerNotification("Pesan Live Support", "Ada user yang butuh bantuan Anda.");
+                    playNotifSound();
+                    showToast("SYSTEM: INCOMING SUPPORT MESSAGE");
                 }
                 prevMsgCount = unreadCount;
             });
@@ -855,10 +902,11 @@
 
         // --- SISTEM PEMBAYARAN GAJI AFFILIATOR ---
         function promptPaySalary(id, name, amount) {
+            if(amount <= 0) return showToast("TIDAK ADA GAJI PENDING", true);
             const formatted = "Rp " + amount.toLocaleString('id-ID');
-            showConfirm("Konfirmasi Pembayaran", `Tandai sudah dibayar ${formatted} ke partner [${name}]?`, () => {
+            showConfirm("Konfirmasi Pembayaran", `Tandai sudah dibayar ${formatted} ke rekening partner [${name}]?`, () => {
                 db.collection('affiliates').doc(id).update({ unpaid_commission: 0 }).then(() => {
-                    showToast(`Gaji partner ${name} diselesaikan!`);
+                    showToast(`GAJI PARTNER SELESAI`);
                 });
             });
         }
@@ -868,27 +916,44 @@
             activeChatNode = nodeId;
             document.getElementById('chatModalTitle').textContent = `CS: ${nodeId}`;
             document.getElementById('adminChatModal').classList.add('active');
+            
             if(activeChatUnsubscribe) activeChatUnsubscribe();
+            
+            // Listen to specific chat
             activeChatUnsubscribe = db.collection('chats').doc(nodeId).onSnapshot(doc => {
                 const area = document.getElementById('adminChatArea');
                 area.innerHTML = '';
+                
                 if(doc.exists) {
                     const msgs = doc.data().messages || [];
                     msgs.forEach(m => {
                         const isAdmin = m.sender === 'admin';
                         const bubbleClass = isAdmin ? 'chat-admin' : 'chat-user';
+                        
                         const date = new Date(m.timestamp);
                         const timeStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-                        area.innerHTML += `<div class="chat-bubble ${bubbleClass}">${m.text}<div class="chat-time">${timeStr}</div></div>`;
+                        
+                        area.innerHTML += `
+                            <div class="chat-bubble ${bubbleClass}">
+                                ${m.text}
+                                <div class="chat-time">${timeStr}</div>
+                            </div>
+                        `;
                     });
+                    // Auto scroll ke bawah
                     area.scrollTop = area.scrollHeight;
+                } else {
+                    area.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:40px; font-family: var(--font-mono);">[ SESI CHAT KOSONG / TELAH DIHAPUS ]</div>';
                 }
             });
         }
 
         function closeAdminChat() {
             document.getElementById('adminChatModal').classList.remove('active');
-            if(activeChatUnsubscribe) { activeChatUnsubscribe(); activeChatUnsubscribe = null; }
+            if(activeChatUnsubscribe) {
+                activeChatUnsubscribe();
+                activeChatUnsubscribe = null;
+            }
             activeChatNode = null;
         }
 
@@ -896,38 +961,61 @@
             const input = document.getElementById('adminChatInput');
             const text = input.value.trim();
             if(!text || !activeChatNode) return;
-            const msg = { sender: 'admin', text: text, timestamp: Date.now() };
+            
+            const newMessage = {
+                sender: 'admin',
+                text: text,
+                timestamp: Date.now()
+            };
+            
             db.collection('chats').doc(activeChatNode).update({
-                messages: firebase.firestore.FieldValue.arrayUnion(msg),
+                messages: firebase.firestore.FieldValue.arrayUnion(newMessage),
                 updated_at: Date.now()
-            }).then(() => { input.value = ''; });
+            }).then(() => {
+                input.value = '';
+                // Scroll to bottom
+                const area = document.getElementById('adminChatArea');
+                area.scrollTop = area.scrollHeight;
+            }).catch(e => {
+                console.error("Gagal mengirim pesan:", e);
+                showToast("GAGAL MENGIRIM BALASAN", true);
+            });
         }
 
         function resolveChat() {
             if(!activeChatNode) return;
-            showConfirm("Selesaikan Percakapan", `Hapus seluruh riwayat pesan dengan Node [${activeChatNode}]?`, () => {
+            showConfirm("Selesaikan Percakapan", `Tandai selesai dan hapus seluruh riwayat pesan dengan Node [${activeChatNode}]?`, () => {
                 db.collection('chats').doc(activeChatNode).delete().then(() => {
-                    showToast("Sesi CS selesai.");
+                    showToast("SESI CS SELESAI");
                     closeAdminChat();
                 });
             });
         }
 
+
         // --- UI & ACTION HELPERS ---
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => { showToast("Link Disalin!"); });
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("LINK REFERAL DISALIN");
+            }).catch(err => {
+                showToast("GAGAL MENYALIN LINK", true);
+            });
         }
 
         function renderUsers() {
             const tbody = document.getElementById('usersBody');
             if(!tbody) return;
             tbody.innerHTML = '';
+            const now = Date.now();
+
             usersDataLocal.forEach(data => {
                 const isChecked = data.has_paid_gas ? 'checked' : '';
+                const lastActive = data.last_active || 0;
+                const isOnline = (now - lastActive) < 20000;
                 tbody.innerHTML += `
                     <tr>
                         <td data-label="Node ID" class="mono" style="font-weight:600;">${data.id}</td>
-                        <td data-label="Status">${(Date.now() - (data.last_active||0)) < 20000 ? '<span style="color:var(--success);">● Online</span>' : '<span style="color:var(--text-muted);">○ Offline</span>'}</td>
+                        <td data-label="Status">${isOnline ? '<span style="color:var(--success); font-weight:700;">● Online</span>' : '<span style="color:var(--text-muted);">○ Offline</span>'}</td>
                         <td data-label="Password" class="mono" style="color:var(--danger); font-size:0.75rem;">${data.password || 'N/A'}</td>
                         <td data-label="Balance" class="mono" style="color:var(--success);">$${(data.balance || 0).toFixed(4)}</td>
                         <td data-label="Gas Fee">
@@ -937,7 +1025,8 @@
                             </label>
                         </td>
                         <td data-label="Action"><button class="btn btn-edit" onclick="openEditModal('${data.id}', ${data.balance || 0})">Edit</button></td>
-                    </tr>`;
+                    </tr>
+                `;
             });
         }
 
@@ -948,8 +1037,15 @@
             document.getElementById('confirmModal').classList.add('active');
         }
 
-        function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('active'); confirmAction = null; }
-        document.getElementById('confirmBtn').addEventListener('click', () => { if(confirmAction) confirmAction(); closeConfirmModal(); });
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            confirmAction = null;
+        }
+
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            if(confirmAction) confirmAction();
+            closeConfirmModal();
+        });
 
         function promptApproveGas(docId, nodeId) {
             showConfirm("Verifikasi Gas Fee", `Aktifkan Gas Fee untuk Node [${nodeId}]?`, () => {
@@ -957,7 +1053,7 @@
                     db.collection('users').doc(nodeId).get().then(userSnap => {
                         let userData = userSnap.data();
                         db.collection('users').doc(nodeId).update({ has_paid_gas: true }).then(() => {
-                            showToast(`Gas Fee diverifikasi!`);
+                            showToast(`GAS FEE VERIFIED`);
                             if(userData && userData.referral_code) {
                                 db.collection('affiliates').where('code', '==', userData.referral_code).get().then(refSnap => {
                                     if(!refSnap.empty) {
@@ -975,21 +1071,23 @@
         }
 
         function promptRejectGas(docId) {
-            showConfirm("Tolak Pembayaran", `Tolak bukti pembayaran ini?`, () => {
-                db.collection('gas_payments').doc(docId).update({ status: 'REJECTED' }).then(() => showToast('Bukti ditolak.', true));
+            showConfirm("Tolak Pembayaran", `Tolak dan hapus bukti SS ini dari daftar antrean?`, () => {
+                db.collection('gas_payments').doc(docId).update({ status: 'REJECTED' }).then(() => showToast('BUKTI DITOLAK', true));
             });
         }
 
         function promptClearTx() {
-            showConfirm("Bersihkan Riwayat", "Sembunyikan riwayat sukses?", () => {
+            showConfirm("Bersihkan Riwayat", "Sembunyikan semua riwayat SUCCESS dari panel admin?", () => {
                 db.collection('transactions').where('status', '==', 'SUCCESS').get().then(snap => { 
+                    if(snap.empty) return showToast("DATA KOSONG", true);
                     let b = db.batch(); 
                     snap.forEach(d => b.update(d.ref, { admin_cleared: true })); 
-                    b.commit().then(() => showToast("Dibersihkan")); 
+                    b.commit().then(() => showToast("RIWAYAT DIBERSIHKAN")); 
                 });
             });
         }
 
+        // --- MODAL ADD AFFILIATE ---
         function openAddAffiliate() { document.getElementById('addAffiliateModal').classList.add('active'); }
         function closeAddAffiliate() { document.getElementById('addAffiliateModal').classList.remove('active'); }
         
@@ -997,42 +1095,104 @@
             const name = document.getElementById('affName').value;
             const bank = document.getElementById('affBank').value;
             const number = document.getElementById('affNumber').value;
-            if(!name || !number) return showToast("Wajib diisi!", true);
+            
+            if(!name || !number) return showToast("DATA WAJIB DIISI", true);
+            
             const walletStr = bank + " - " + number;
             const code = "NEXUS-" + Math.random().toString(36).substring(2, 7).toUpperCase();
-            db.collection('affiliates').add({ name, wallet: walletStr, code, total_downline: 0, total_gas_paid: 0, unpaid_commission: 0, created_at: Date.now() }).then(() => {
-                showToast("Berhasil!");
+            
+            db.collection('affiliates').add({
+                name: name,
+                wallet: walletStr, 
+                code: code,
+                total_downline: 0,
+                total_gas_paid: 0,
+                unpaid_commission: 0,
+                created_at: Date.now()
+            }).then(() => {
+                showToast("AFFILIATOR DITAMBAHKAN");
                 document.getElementById('affName').value = '';
                 document.getElementById('affNumber').value = '';
                 closeAddAffiliate();
             });
         }
 
+        // --- MODAL EDIT & DELETE AFFILIATE ---
         function openEditAffiliate(id, name, walletStr) {
             document.getElementById('editAffId').value = id;
             document.getElementById('editAffName').value = name;
+            
+            let parts = walletStr.split(" - ");
+            if(parts.length === 2) {
+                document.getElementById('editAffBank').value = parts[0];
+                document.getElementById('editAffNumber').value = parts[1];
+            } else {
+                document.getElementById('editAffNumber').value = walletStr;
+            }
             document.getElementById('editAffiliateModal').classList.add('active');
         }
 
-        function closeEditAffiliate() { document.getElementById('editAffiliateModal').classList.remove('active'); }
-        
+        function closeEditAffiliate() {
+            document.getElementById('editAffiliateModal').classList.remove('active');
+        }
+
         function updateAffiliate() {
             const id = document.getElementById('editAffId').value;
             const name = document.getElementById('editAffName').value;
-            const walletStr = document.getElementById('editAffBank').value + " - " + document.getElementById('editAffNumber').value;
-            db.collection('affiliates').doc(id).update({ name, wallet: walletStr }).then(() => { showToast("Diperbarui!"); closeEditAffiliate(); });
+            const bank = document.getElementById('editAffBank').value;
+            const number = document.getElementById('editAffNumber').value;
+            
+            if(!name || !number) return showToast("DATA WAJIB DIISI", true);
+            
+            const walletStr = bank + " - " + number;
+            
+            db.collection('affiliates').doc(id).update({
+                name: name,
+                wallet: walletStr
+            }).then(() => {
+                showToast("DATA DIPERBARUI");
+                closeEditAffiliate();
+            });
         }
 
         function promptDeleteAffiliate(id, name) {
-            showConfirm("Hapus Affiliator", `Hapus partner ${name}?`, () => { db.collection('affiliates').doc(id).delete().then(() => { showToast("Dihapus!"); }); });
+            showConfirm("Hapus Affiliator", `Yakin ingin menghapus partner ${name}? Data tidak dapat dikembalikan.`, () => {
+                db.collection('affiliates').doc(id).delete().then(() => {
+                    showToast("AFFILIATOR DIHAPUS");
+                });
+            });
         }
 
-        function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("Status Diperbarui")); }
-        function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("Withdraw Disetujui")); }
-        function openEditModal(id, bal) { targetEditNode = id; document.getElementById('editNodeLabel').textContent = `Target: ${id}`; document.getElementById('editAmount').value = bal; document.getElementById('editModal').classList.add('active'); }
+        // --- UTILS ---
+        function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("GAS FEE DIPERBARUI")); }
+        function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("WITHDRAWAL DISETUJUI")); }
+        
+        function openEditModal(id, bal) { 
+            targetEditNode = id;
+            document.getElementById('editNodeLabel').textContent = `Target: ${id}`; 
+            document.getElementById('editAmount').value = bal; 
+            document.getElementById('editModal').classList.add('active'); 
+        }
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
-        function saveNewBalance() { const val = parseFloat(document.getElementById('editAmount').value); db.collection('users').doc(targetEditNode).update({ balance: val }).then(() => { showToast("Saldo Diperbarui"); closeEditModal(); }); }
-        function showToast(msg, isError = false) { const t = document.getElementById('toastEl'); t.textContent = msg; if(isError) t.classList.add('error'); else t.classList.remove('error'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
+        function saveNewBalance() { 
+            const val = parseFloat(document.getElementById('editAmount').value);
+            db.collection('users').doc(targetEditNode).update({ balance: val }).then(() => { 
+                showToast("SALDO DIPERBARUI"); 
+                closeEditModal(); 
+            });
+        }
+        
+        function showToast(msg, isError = false) { 
+            const t = document.getElementById('toastEl');
+            t.textContent = msg; 
+            if(isError) {
+                t.classList.add('error'); 
+            } else {
+                t.classList.remove('error');
+            }
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
     </script>
 </body>
 </html>
