@@ -147,6 +147,13 @@
             align-items: center;
             justify-content: center;
             min-width: 20px;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+            animation: pulse-badge 2s infinite;
+        }
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .dashboard-grid { 
@@ -513,6 +520,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
     <script>
+        // --- SISTEM SUARA NOTIFIKASI ---
+        const notifSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        function playNotifSound() {
+            notifSound.play().catch(e => console.log("Audio diblokir browser, klik layarnya dulu."));
+        }
+
+        // Variabel pelacak badge untuk membunyikan suara hanya jika jumlahnya naik
+        let prevGasCount = -1;
+        let prevWdCount = -1;
+        let prevMsgCount = -1;
+
         // --- SISTEM LOGIN ADMIN ---
         const VALID_USER = "admin#1234";
         const VALID_PASS = "admin#superuser#1234";
@@ -535,6 +553,8 @@
                 document.getElementById('pgDash').classList.add('active');
                 initAdminSystem(); 
                 showToast("Access Granted");
+                // Trigger audio sekali biar browser mengizinkan audio autoplay ke depannya
+                notifSound.play().catch(e=>{}); 
             } else {
                 showToast("Kredensial Admin Salah!", true);
             }
@@ -613,8 +633,12 @@
                 const tbody = document.getElementById('gasBody');
                 tbody.innerHTML = '';
                 
-                // UPDATE BADGE GAS FEE
-                updateBadge('badge-gas', snapshot.size);
+                let currentGas = snapshot.size;
+                updateBadge('badge-gas', currentGas);
+
+                // Bunyikan suara jika ada yang baru masuk
+                if (prevGasCount !== -1 && currentGas > prevGasCount) playNotifSound();
+                prevGasCount = currentGas;
                 
                 if (snapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada bukti pembayaran baru.</td></tr>`;
@@ -661,6 +685,10 @@
                 
                 // UPDATE BADGE WD
                 updateBadge('badge-wd', pendingWdCount);
+
+                // Bunyikan suara jika ada WD baru
+                if (prevWdCount !== -1 && pendingWdCount > prevWdCount) playNotifSound();
+                prevWdCount = pendingWdCount;
 
                 if (txList.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada transaksi dalam antrean.</td></tr>`;
@@ -786,29 +814,35 @@
                 updateBadge('badge-salary', pendingSalaryCount);
             });
 
-            // CHAT / CUSTOMER SERVICE LISTENER
+            // CHAT / CUSTOMER SERVICE LISTENER (DIPERBAIKI LOGIKANYA)
             db.collection('chats').onSnapshot(snapshot => {
                 const tbody = document.getElementById('msgBody');
                 if(!tbody) return;
                 tbody.innerHTML = '';
                 
-                // UPDATE BADGE PESAN (Jumlah pengguna yg sedang ngechat)
-                updateBadge('badge-msg', snapshot.size);
-
-                if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada pesan masuk.</td></tr>';
-                    return;
-                }
-                
+                let unreadCount = 0; // Hitung pesan yang butuh dibalas admin
                 let chats = [];
+                
                 snapshot.forEach(doc => {
                     chats.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // Urutkan berdasarkan waktu terakhir update (pesan terbaru di atas)
+                if(chats.length === 0) {
+                    updateBadge('badge-msg', 0);
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada pesan masuk.</td></tr>';
+                    return;
+                }
+                
+                // Urutkan berdasarkan waktu terakhir update
                 chats.sort((a, b) => b.updated_at - a.updated_at).forEach(data => {
                     const msgs = data.messages || [];
-                    const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1].text : '';
+                    const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
+                    const lastText = lastMsg ? lastMsg.text : '';
+                    
+                    // Jika pengirim pesan terakhir adalah 'user', artinya Admin belum membalas
+                    if (lastMsg && lastMsg.sender === 'user') {
+                        unreadCount++;
+                    }
                     
                     let timeStr = '';
                     if (data.updated_at) {
@@ -818,14 +852,18 @@
                         timeStr = `${hours}:${minutes}`;
                     }
 
+                    // Tambahkan highlight kuning jika pesan belum dibalas
+                    const isUnread = (lastMsg && lastMsg.sender === 'user');
+                    const rowStyle = isUnread ? 'border-left: 3px solid var(--warning); background: rgba(245, 158, 11, 0.05);' : '';
+
                     tbody.innerHTML += `
-                        <tr>
+                        <tr style="${rowStyle}">
                             <td data-label="Node ID" class="mono" style="font-weight:700; color:var(--accent);">${data.id}</td>
-                            <td data-label="Pesan Terakhir" style="color:var(--text-muted); font-size:0.75rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${lastMsg}</td>
+                            <td data-label="Pesan Terakhir" style="color:${isUnread ? 'var(--text-main)' : 'var(--text-muted)'}; font-size:0.75rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: ${isUnread ? '700' : 'normal'};">${lastText}</td>
                             <td data-label="Waktu" style="font-size:0.7rem; color:var(--text-muted); font-family: var(--font-mono);">${timeStr}</td>
                             <td data-label="Action">
                                 <div style="display:flex; justify-content:flex-end;">
-                                    <button class="btn btn-success" style="display: flex; align-items: center; gap: 4px;" onclick="openAdminChat('${data.id}')">
+                                    <button class="btn ${isUnread ? 'btn-success' : 'btn-edit'}" style="display: flex; align-items: center; gap: 4px;" onclick="openAdminChat('${data.id}')">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                         Balas
                                     </button>
@@ -834,6 +872,13 @@
                         </tr>
                     `;
                 });
+
+                // UPDATE BADGE PESAN BELUM DIBALAS
+                updateBadge('badge-msg', unreadCount);
+
+                // Bunyikan suara jika ada chat baru masuk
+                if (prevMsgCount !== -1 && unreadCount > prevMsgCount) playNotifSound();
+                prevMsgCount = unreadCount;
             });
         }
 
