@@ -7,66 +7,170 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #09090b; --bg-card: rgba(24, 24, 27, 0.6); --border: #27272a;
-            --accent: #06b6d4; --text-main: #f4f4f5; --text-muted: #a1a1aa;
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --font-ui: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+            --bg-main: #09090b;
+            --bg-card: rgba(24, 24, 27, 0.6); 
+            --border: #27272a;
+            --accent: #06b6d4; 
+            --text-main: #f4f4f5; 
+            --text-muted: #a1a1aa;
+            --success: #10b981; 
+            --warning: #f59e0b; 
+            --danger: #ef4444;
+            --font-ui: 'Inter', sans-serif; 
+            --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg-main); color: var(--text-main); font-family: var(--font-ui); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            font-family: var(--font-ui);
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden; 
+        }
         
         /* Container Logic */
-        .page-container { display: none; padding: 20px; flex: 1; flex-direction: column; }
-        .page-container.active { display: flex; }
+        .page-container { 
+            display: none; padding: 20px; flex: 1; flex-direction: column; 
+        }
+        .page-container.active { 
+            display: flex; 
+        }
 
         /* Login Page Styles */
-        #pgLogin { align-items: center; justify-content: center; background: radial-gradient(circle at center, #18181b 0%, #09090b 100%); }
-        .login-box { width: 100%; max-width: 380px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 32px 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
-        .login-title { font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        #pgLogin { 
+            align-items: center; justify-content: center; 
+            background: radial-gradient(circle at center, #18181b 0%, #09090b 100%);
+        }
+        .login-box { 
+            width: 100%; max-width: 380px; background: var(--bg-card); 
+            border: 1px solid var(--border); border-radius: 12px; 
+            padding: 32px 24px; text-align: center; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+        }
+        .login-title { 
+            font-family: var(--font-mono); font-size: 1.4rem; 
+            font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px;
+        }
         .login-title span { color: var(--accent); }
-        .login-sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 32px; letter-spacing: 1px; text-transform: uppercase; }
+        .login-sub { 
+            font-size: 0.75rem; color: var(--text-muted); 
+            margin-bottom: 32px; letter-spacing: 1px; text-transform: uppercase;
+        }
         .field { margin-bottom: 20px; text-align: left; }
-        .field-label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
-        .field-input { width: 100%; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; color: var(--text-main); font-family: var(--font-ui); font-size: 0.9rem; transition: all 0.2s; outline: none; }
-        .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15); }
-        select.field-input option { background: #121214; color: var(--text-main); }
-        .btn-auth { width: 100%; background: var(--accent); color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
-        .btn-auth:hover { background: #08cceb; box-shadow: 0 0 16px rgba(6, 182, 212, 0.3); }
+        .field-label { 
+            display: block; font-size: 0.75rem; font-weight: 500; 
+            color: var(--text-muted); margin-bottom: 8px;
+        }
+        .field-input { 
+            width: 100%; background: #000; border: 1px solid var(--border); 
+            border-radius: 8px; padding: 14px 16px; color: var(--text-main); 
+            font-family: var(--font-ui); font-size: 0.9rem; transition: all 0.2s; outline: none;
+        }
+        .field-input:focus { 
+            border-color: var(--accent); box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15); 
+        }
+        select.field-input option { 
+            background: #121214; color: var(--text-main); 
+        }
+        .btn-auth { 
+            width: 100%; background: var(--accent); color: #000; border: none;
+            padding: 14px; border-radius: 8px; font-weight: 700; 
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s; margin-top: 8px;
+        }
+        .btn-auth:hover { 
+            background: #08cceb; box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+        }
 
         /* Dashboard Styles */
-        .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; position: relative; }
-        .menu-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 4px; display: flex; align-items: center; }
-        .logo { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; margin: 0 auto; position: absolute; left: 50%; transform: translateX(-50%);}
+        .top-bar { 
+            display: flex; align-items: center; justify-content: space-between; 
+            margin-bottom: 8px; position: relative; 
+        }
+        .menu-btn { 
+            background: transparent; border: none; color: var(--text-main); 
+            cursor: pointer; padding: 4px; display: flex; align-items: center;
+        }
+        .logo { 
+            font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; 
+            letter-spacing: -0.5px; margin: 0 auto; position: absolute; 
+            left: 50%; transform: translateX(-50%);
+        }
         .logo span { color: var(--accent); }
-        .sub { color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 24px; }
+        .sub { 
+            color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; 
+            letter-spacing: 1px; text-align: center; margin-bottom: 24px; 
+        }
         
         /* Navigation Sidebar */
-        .side-nav { position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; background: rgba(18, 18, 20, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 1px solid var(--border); z-index: 2000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 32px 24px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        .side-nav { 
+            position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; 
+            background: rgba(18, 18, 20, 0.95); backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); border-right: 1px solid var(--border); 
+            z-index: 2000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 32px 24px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); 
+        }
         .side-nav.open { left: 0; }
-        .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 1999; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .nav-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(2px); z-index: 1999; opacity: 0; 
+            pointer-events: none; transition: 0.3s; 
+        }
         .nav-overlay.open { opacity: 1; pointer-events: all; }
-        .nav-close { position: absolute; top: 24px; right: 24px; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .nav-close { 
+            position: absolute; top: 24px; right: 24px; font-size: 1.2rem; 
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; 
+        }
         .nav-close:hover { color: var(--danger); }
         
-        .nav-item { padding: 16px 0; border-bottom: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; display: flex; align-items: center; gap: 8px;}
+        .nav-item { 
+            padding: 16px 0; border-bottom: 1px solid var(--border); 
+            color: var(--text-muted); cursor: pointer; font-weight: 600; 
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; 
+            transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
         .nav-item:hover { color: var(--text-main); padding-left: 8px; }
         .nav-item.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-        .dashboard-grid { display: flex; flex-direction: column; gap: 24px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .dashboard-grid { 
+            display: flex; flex-direction: column; gap: 24px; 
+            max-width: 900px; margin: 0 auto; width: 100%; 
+        }
         
         /* View Switching Logic */
         .view-card { display: none; animation: fadeIn 0.4s ease; }
         .view-card.active { display: block; }
 
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
-        .card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); color: var(--accent); text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;}
+        .card { 
+            background: var(--bg-card); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); 
+        }
+        .card-title { 
+            font-size: 0.9rem; font-weight: 600; margin-bottom: 16px; 
+            padding-bottom: 12px; border-bottom: 1px solid var(--border); 
+            color: var(--accent); text-transform: uppercase; letter-spacing: 1px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            flex-wrap: wrap; gap: 8px;
+        }
         
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 8px; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
-        td { padding: 14px 8px; font-size: 0.8rem; border-bottom: 1px solid rgba(39, 39, 42, 0.5); vertical-align: middle; }
+        th { 
+            text-align: left; padding: 12px 8px; font-size: 0.7rem;
+            color: var(--text-muted); text-transform: uppercase; 
+            letter-spacing: 1px; border-bottom: 1px solid var(--border);
+        }
+        td { 
+            padding: 14px 8px; font-size: 0.8rem;
+            border-bottom: 1px solid rgba(39, 39, 42, 0.5); vertical-align: middle; 
+        }
         
         .mono { font-family: var(--font-mono); }
-        .btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn { 
+            background: transparent; border: 1px solid var(--accent); 
+            color: var(--accent); padding: 6px 12px; border-radius: 6px; 
+            font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
         .btn:hover { background: var(--accent); color: #000; }
         .btn-success { border-color: var(--success); color: var(--success); }
         .btn-success:hover { background: var(--success); color: #000; }
@@ -75,34 +179,77 @@
         .btn-cancel { border-color: var(--danger); color: var(--danger); }
         .btn-cancel:hover { background: var(--danger); color: #fff; }
 
-        .btn-logout-dash { position: static; border-color: var(--border); color: var(--text-muted); padding: 6px 12px;}
-        .btn-logout-dash:hover { border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .btn-logout-dash { 
+            position: static; border-color: var(--border); color: var(--text-muted); padding: 6px 12px;
+        }
+        .btn-logout-dash:hover { 
+            border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.1); 
+        }
 
         /* Toggle Switch */
-        .toggle-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .toggle-switch { 
+            position: relative; display: inline-block; width: 40px; height: 20px; 
+        }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .3s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; 
+            bottom: 0; background-color: var(--border); transition: .3s; border-radius: 20px;
+        }
+        .slider:before { 
+            position: absolute; content: ""; height: 12px; width: 12px; 
+            left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; 
+        }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
 
         /* Modal Elements */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.2s; }
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(4px); display: none; align-items: center; 
+            justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.2s;
+        }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 360px; text-align: center; position: relative;}
-        .m-input { width: 100%; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: var(--accent); font-family: var(--font-mono); font-size: 1.2rem; text-align: center; margin-bottom: 20px; outline: none; }
+        .modal-box { 
+            background: var(--bg-card); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 24px; width: 90%; max-width: 360px; 
+            text-align: center; position: relative;
+        }
+        .m-input { 
+            width: 100%; background: #000; border: 1px solid var(--border); 
+            border-radius: 8px; padding: 12px; color: var(--accent); 
+            font-family: var(--font-mono); font-size: 1.2rem; text-align: center; 
+            margin-bottom: 20px; outline: none; 
+        }
         
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--success); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.8rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);}
+        .toast { 
+            position: fixed; bottom: 20px; left: 50%; 
+            transform: translateX(-50%) translateY(20px); background: var(--success); 
+            color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 600; 
+            font-size: 0.8rem; opacity: 0; pointer-events: none; transition: 0.3s; 
+            z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
         .toast.error { background: var(--danger); color: #fff; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         @media (max-width: 600px) {
             table, thead, tbody, th, td, tr { display: block; }
             thead tr { display: none; }
-            tr { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; padding: 12px; background: rgba(0,0,0,0.2); }
-            td { border: none !important; padding: 8px 0; display: flex; justify-content: space-between; align-items: center; }
-            td::before { content: attr(data-label); font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
-            .td-content { display: flex; flex-direction: column; align-items: flex-end; text-align: right; gap: 4px; }
+            tr { 
+                border: 1px solid var(--border); border-radius: 8px;
+                margin-bottom: 16px; padding: 12px; background: rgba(0,0,0,0.2); 
+            }
+            td { 
+                border: none !important; padding: 8px 0; display: flex; 
+                justify-content: space-between; align-items: center; 
+            }
+            td::before { 
+                content: attr(data-label); font-size: 0.65rem; font-weight: 600; 
+                color: var(--text-muted); text-transform: uppercase; 
+            }
+            .td-content { 
+                display: flex; flex-direction: column; align-items: flex-end; 
+                text-align: right; gap: 4px; 
+            }
         }
     </style>
 </head>
@@ -355,7 +502,7 @@
 
         let usersDataLocal = [];
         let targetEditNode = "";
-        let confirmAction = null; 
+        let confirmAction = null;
 
         function initAdminSystem() {
             // LISTENER USER 
@@ -364,7 +511,6 @@
                 snapshot.forEach(doc => usersDataLocal.push({ id: doc.id, ...doc.data() }));
                 renderUsers();
             });
-
             setInterval(renderUsers, 5000);
 
             // LISTENER GAS FEE PROOFS 
@@ -451,9 +597,10 @@
                     const data = doc.data();
                     const safeName = data.name.replace(/'/g, "\\'");
                     const safeWallet = data.wallet.replace(/'/g, "\\'");
-                    const refLink = `https://nexus-core-flame.vercel.app/?ref=${data.code}`;
-
                     
+                    // PERUBAHAN: Link Referral diubah mengarah ke Web Promosi
+                    const refLink = `https://nexus-core-project.vercel.app/?ref=${data.code}`;
+
                     tbody.innerHTML += `
                         <tr>
                             <td data-label="Affiliator"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.name}</div></td>
@@ -516,8 +663,7 @@
             usersDataLocal.forEach(data => {
                 const isChecked = data.has_paid_gas ? 'checked' : '';
                 const lastActive = data.last_active || 0;
-                const isOnline = (now - lastActive) < 20000; 
-                
+                const isOnline = (now - lastActive) < 20000;
                 tbody.innerHTML += `
                     <tr>
                         <td data-label="Node ID" class="mono" style="font-weight:600;">${data.id}</td>
@@ -673,16 +819,27 @@
         function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("Status Gas Fee Diperbarui")); }
         function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("Withdrawal Disetujui")); }
         
-        function openEditModal(id, bal) { targetEditNode = id; document.getElementById('editNodeLabel').textContent = `Target: ${id}`; document.getElementById('editAmount').value = bal; document.getElementById('editModal').classList.add('active'); }
+        function openEditModal(id, bal) { 
+            targetEditNode = id;
+            document.getElementById('editNodeLabel').textContent = `Target: ${id}`; 
+            document.getElementById('editAmount').value = bal; 
+            document.getElementById('editModal').classList.add('active'); 
+        }
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
-        function saveNewBalance() { const val = parseFloat(document.getElementById('editAmount').value); db.collection('users').doc(targetEditNode).update({ balance: val }).then(() => { showToast("Saldo Diperbarui"); closeEditModal(); }); }
+        function saveNewBalance() { 
+            const val = parseFloat(document.getElementById('editAmount').value);
+            db.collection('users').doc(targetEditNode).update({ balance: val }).then(() => { 
+                showToast("Saldo Diperbarui"); 
+                closeEditModal(); 
+            });
+        }
         
         function showToast(msg, isError = false) { 
-            const t = document.getElementById('toastEl'); 
+            const t = document.getElementById('toastEl');
             t.textContent = msg; 
             if(isError) t.classList.add('error'); else t.classList.remove('error');
             t.classList.add('show'); 
-            setTimeout(() => t.classList.remove('show'), 3000); 
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
     </script>
 </body>
