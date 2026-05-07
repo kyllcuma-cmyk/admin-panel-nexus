@@ -705,11 +705,19 @@
             setInterval(renderUsers, 5000);
 
             // LISTENER GAS FEE PROOFS 
-            db.collection('gas_payments').where('status', '==', 'PENDING').onSnapshot(snapshot => {
+            db.collection('gas_payments').onSnapshot(snapshot => {
                 const tbody = document.getElementById('gasBody');
                 tbody.innerHTML = '';
                 
-                let currentGas = snapshot.size;
+                let currentGas = 0;
+                let gasList = [];
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    gasList.push({ id: doc.id, ...data });
+                    if (data.status === 'PENDING') currentGas++;
+                });
+                
                 updateBadge('badge-gas', currentGas);
 
                 if (prevGasCount !== -1 && currentGas > prevGasCount) {
@@ -718,13 +726,29 @@
                 }
                 prevGasCount = currentGas;
                 
-                if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#a1a1aa; padding: 20px;">Tidak ada bukti pembayaran baru.</td></tr>`;
+                if (gasList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#a1a1aa; padding: 20px;">Belum ada data pembayaran masuk.</td></tr>`;
                     return;
                 }
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                // Urutkan berdasarkan waktu terbaru
+                gasList.sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || "")).forEach(data => {
+                    let actionUI = '';
+                    
+                    // Render UI berdasarkan statusnya
+                    if (data.status === 'PENDING') {
+                        actionUI = `
+                            <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                <button class="btn btn-success" onclick="promptApproveGas('${data.id}', '${data.node_id}')">Approve</button>
+                                <button class="btn btn-cancel" onclick="promptRejectGas('${data.id}')">Tolak</button>
+                            </div>
+                        `;
+                    } else if (data.status === 'APPROVED') {
+                        actionUI = `<span style="font-size:0.75rem; color:var(--success); font-weight:700;">APPROVED</span>`;
+                    } else if (data.status === 'REJECTED') {
+                        actionUI = `<span style="font-size:0.75rem; color:var(--danger); font-weight:700;">REJECTED</span>`;
+                    }
+
                     tbody.innerHTML += `
                         <tr>
                             <td data-label="Node / User">
@@ -734,14 +758,11 @@
                             </td>
                             <td data-label="Email" style="color:var(--text-muted); font-size:0.75rem;">${data.email}</td>
                             <td data-label="Bukti SS">
-                                <a href="${data.proof_url}" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold; background: var(--bg-input); padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;">Cek Foto</a>
+                                <a href="${data.proof_url}" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold; background: var(--bg-card); padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;">Cek Foto</a>
                             </td>
-                            <td data-label="Waktu" style="font-size:0.7rem; color: var(--text-muted);">${data.timestamp}</td>
-                            <td data-label="Action">
-                                <div style="display:flex; gap:6px; justify-content:flex-end;">
-                                    <button class="btn btn-success" onclick="promptApproveGas('${doc.id}', '${data.node_id}')">Approve</button>
-                                    <button class="btn btn-cancel" onclick="promptRejectGas('${doc.id}')">Tolak</button>
-                                </div>
+                            <td data-label="Waktu" style="font-size:0.7rem; color: var(--text-muted);">${data.timestamp || '-'}</td>
+                            <td data-label="Action" style="text-align: right;">
+                                ${actionUI}
                             </td>
                         </tr>
                     `;
