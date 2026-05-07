@@ -470,6 +470,19 @@
                     <tbody id="affiliateBody"></tbody>
                 </table>
             </div>
+            
+            <div class="card view-card" id="card-affiliate-downline">
+                <div class="card-title" style="justify-content: flex-start; gap: 16px;">
+                    <button class="btn btn-edit" style="padding: 6px 12px; font-size: 0.75rem; border-color: var(--border); color: var(--text-main);" onclick="backToAffiliates()">← Back</button>
+                    <span>▶ Downline: <span id="downlineAffName" style="color: var(--accent);"></span></span>
+                </div>
+                <table>
+                    <thead><tr><th>Node ID</th><th>Status Gas Fee</th></tr></thead>
+                    <tbody id="downlineBody">
+                        <tr><td colspan="2" style="text-align:center; color:var(--text-muted);">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="card view-card" id="card-salary">
                 <div class="card-title"><span>▶ Payout Gaji Affiliator</span></div>
@@ -658,9 +671,11 @@
             document.getElementById(viewId).classList.add('active');
             
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
+            if(el) el.classList.add('active');
             
-            toggleNav();
+            if (document.getElementById('sideNav').classList.contains('open')) {
+                toggleNav();
+            }
         }
 
         // --- HELPER UNTUK UPDATE BADGE ---
@@ -881,7 +896,8 @@
                                 </div>
                             </td>
                             <td data-label="Action">
-                                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                <div style="display:flex; gap:6px; justify-content:flex-end; flex-wrap: wrap;">
+                                    <button class="btn btn-success" onclick="viewDownlines('${data.code}', '${safeName}')">Lihat Bawahan</button>
                                     <button class="btn btn-edit" onclick="openEditAffiliate('${doc.id}', '${safeName}', '${safeWallet}')">Edit</button>
                                     <button class="btn btn-cancel" onclick="promptDeleteAffiliate('${doc.id}', '${safeName}')">Hapus</button>
                                 </div>
@@ -1245,6 +1261,59 @@
                     showToast("Affiliate Deleted");
                 });
             });
+        }
+
+        // --- SISTEM LIHAT DOWNLINE AFFILIATE ---
+        let downlineUnsubscribe = null;
+
+        function viewDownlines(refCode, affName) {
+            document.getElementById('downlineAffName').textContent = affName;
+            
+            // Sembunyikan halaman affiliate, tampilkan halaman downline
+            document.querySelectorAll('.view-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-affiliate-downline').classList.add('active');
+
+            const tbody = document.getElementById('downlineBody');
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:var(--text-muted); padding: 20px;">Memuat data bawahan...</td></tr>';
+
+            // Bersihkan listener lama jika ada
+            if(downlineUnsubscribe) downlineUnsubscribe();
+
+            // Ambil data user yang pakai referral code ini
+            downlineUnsubscribe = db.collection('users').where('referral_code', '==', refCode).onSnapshot(snapshot => {
+                tbody.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:var(--text-muted); padding: 20px;">Belum ada bawahan yang mendaftar.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const hasGas = data.has_paid_gas ? 
+                        '<span style="color:var(--success); font-weight:700; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px;">SUDAH BAYAR</span>' : 
+                        '<span style="color:var(--danger); font-weight:700; background: rgba(239, 68, 68, 0.1); padding: 4px 8px; border-radius: 4px;">BELUM</span>';
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td data-label="Node ID" class="mono" style="font-weight:700; color:var(--text-main); font-size: 0.9rem;">${doc.id}</td>
+                            <td data-label="Gas Fee">${hasGas}</td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function backToAffiliates() {
+            // Matikan listener biar nggak berat
+            if(downlineUnsubscribe) {
+                downlineUnsubscribe();
+                downlineUnsubscribe = null;
+            }
+            
+            // Sembunyikan halaman downline, kembali ke affiliate
+            document.querySelectorAll('.view-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-affiliate').classList.add('active');
         }
 
         // --- UTILS ---
