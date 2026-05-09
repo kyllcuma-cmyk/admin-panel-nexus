@@ -419,9 +419,14 @@
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 Affiliate Network
             </div>
+            <div class="nav-item" onclick="switchView('card-aff-wd', this)">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Antrean Penarikan (WD)
+                <span class="nav-badge" id="badge-aff-wd">0</span>
+            </div>
             <div class="nav-item" onclick="switchView('card-salary', this)">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                Gaji Affiliator
+                Manajemen Afiliator
                 <span class="nav-badge" id="badge-salary">0</span>
             </div>
             <div class="nav-item" onclick="switchView('card-messages', this)">
@@ -462,7 +467,7 @@
 
             <div class="card view-card" id="card-affiliate">
                 <div class="card-title">
-                    <span>▶ Affiliate Partners</span>
+                    <span>▶ Jaringan Afiliasi (Monitoring)</span>
                     <button class="btn btn-success" style="font-size: 0.65rem; padding: 6px 10px;" onclick="openAddAffiliate()">+ Add Partner</button>
                 </div>
                 <table>
@@ -484,11 +489,35 @@
                 </table>
             </div>
 
+            <div class="card view-card" id="card-aff-wd">
+                <div class="card-title"><span>▶ Antrean Penarikan (WD)</span></div>
+                <table>
+                    <thead><tr><th>Nama (Node ID)</th><th>Metode & Rekening</th><th>Nominal (IDR)</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="affWdBody"></tbody>
+                </table>
+            </div>
+
             <div class="card view-card" id="card-salary">
-                <div class="card-title"><span>▶ Payout Gaji Affiliator</span></div>
+                <div class="card-title" style="justify-content: space-between;">
+                    <span>▶ Manajemen Afiliator</span>
+                    <button class="btn btn-edit" style="font-size: 0.65rem; padding: 6px 10px;" onclick="openSalaryHistory()">Lihat Riwayat</button>
+                </div>
                 <table>
                     <thead><tr><th>Affiliator</th><th>Rekening / E-Wallet</th><th>Total Gaji (Pending)</th><th>Action</th></tr></thead>
                     <tbody id="salaryBody"></tbody>
+                </table>
+            </div>
+
+            <div class="card view-card" id="card-salary-history">
+                <div class="card-title" style="justify-content: flex-start; gap: 16px;">
+                    <button class="btn btn-edit" style="padding: 6px 12px; font-size: 0.75rem; border-color: var(--border); color: var(--text-main);" onclick="backToSalary()">← Back</button>
+                    <span>▶ Riwayat Pembayaran Gaji</span>
+                </div>
+                <table>
+                    <thead><tr><th>Affiliator</th><th>Metode & Rekening</th><th>Nominal</th><th>Waktu</th></tr></thead>
+                    <tbody id="salaryHistoryBody">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Memuat riwayat...</td></tr>
+                    </tbody>
                 </table>
             </div>
 
@@ -594,6 +623,10 @@
                     <input class="field-input" type="number" id="editAffNumber" placeholder="08xxxxxxxx" style="width: 55%;">
                 </div>
             </div>
+            <div class="field" style="text-align: left;">
+                <label class="field-label">Node ID User (Opsional)</label>
+                <input class="field-input" type="text" id="editAffNodeId" placeholder="Masukkan UID/Node ID User">
+            </div>
             <div style="display: flex; gap: 12px;">
                 <button class="btn btn-cancel" style="flex: 1;" onclick="closeEditAffiliate()">Batal</button>
                 <button class="btn btn-success" style="flex: 1;" onclick="updateAffiliate()">Simpan Data</button>
@@ -620,6 +653,7 @@
         let prevGasCount = -1;
         let prevWdCount = -1;
         let prevMsgCount = -1;
+        let prevAffWdCount = -1;
 
         // --- SISTEM LOGIN ADMIN ---
         const VALID_USER = "admin#1234";
@@ -855,8 +889,10 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const safeName = data.name.replace(/'/g, "\\'");
-                    const safeWallet = data.wallet.replace(/'/g, "\\'");
+                    const name = data.name || data.code || 'Tanpa Nama';
+                    const safeName = name.replace(/'/g, "\\'");
+                    const walletRaw = data.wallet || (data.method ? data.method + ' - ' + (data.phone || '') : '');
+                    const safeWallet = walletRaw.replace(/'/g, "\\'");
                     const refLink = `https://nexus-core-project.vercel.app/?ref=${data.code}`;
                     const unpaidComm = data.unpaid_commission || 0;
 
@@ -875,7 +911,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td data-label="Rekening" style="color:var(--text-muted); font-size:0.75rem;">${data.wallet}</td>
+                            <td data-label="Rekening" style="color:var(--text-muted); font-size:0.75rem;">${walletRaw || '-'}</td>
                             <td data-label="Stats">
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                     <div title="Total Downline" style="display: flex; align-items: center; gap: 6px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--accent); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
@@ -909,7 +945,7 @@
                     tbodySal.innerHTML += `
                         <tr>
                             <td data-label="Affiliator"><div class="mono" style="font-weight:700; color:var(--text-main);">${data.name}</div></td>
-                            <td data-label="Rekening" style="color:var(--text-muted); font-size:0.75rem;">${data.wallet}</td>
+                            <td data-label="Rekening" style="color:var(--text-muted); font-size:0.75rem;">${walletRaw || '-'}</td>
                             <td data-label="Total Gaji">
                                 <div class="mono" style="font-weight: 700; color: ${unpaidComm > 0 ? 'var(--success)' : 'var(--text-muted)'}; font-size: 0.9rem;">
                                     Rp ${unpaidComm.toLocaleString('id-ID')}
@@ -929,6 +965,85 @@
                 
                 // UPDATE BADGE GAJI AFFILIATOR
                 updateBadge('badge-salary', pendingSalaryCount);
+            });
+
+            // LISTENER PENGAJUAN GAJI AFFILIATOR
+            db.collection('affiliate_withdrawals').onSnapshot(snapshot => {
+                const tbodyWd = document.getElementById('affWdBody');
+                if(!tbodyWd) return;
+
+                tbodyWd.innerHTML = '';
+                let pendingCount = 0;
+                let wdList = [];
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    wdList.push({ id: doc.id, ...data });
+                    if (data.status === 'PENDING') pendingCount++;
+                });
+
+                updateBadge('badge-aff-wd', pendingCount);
+
+                if (prevAffWdCount !== -1 && pendingCount > prevAffWdCount) {
+                    playNotifSound();
+                    showToast("New Salary Request");
+                }
+                prevAffWdCount = pendingCount;
+
+                const renderRow = (data) => {
+                    const safeName = (data.name || '').replace(/'/g, "\\'");
+                    const nodeId = data.node_id || '';
+                    
+                    let statusLabel = '';
+                    if (data.status === 'SUCCESS') statusLabel = '<span style="color:var(--success); font-weight:700;">SUCCESS</span>';
+                    else if (data.status === 'PROSES') statusLabel = '<span style="color:var(--danger); font-weight:700;">PROSES</span>';
+                    else if (data.status === 'REJECTED') statusLabel = '<span style="color:var(--danger); font-weight:700;">REJECTED</span>';
+                    else statusLabel = '<span style="color:var(--warning); font-weight:700;">PENDING</span>';
+
+                    let actionUI = '';
+                    if (data.status === 'PENDING') {
+                        actionUI = `<button class="btn btn-warning" style="border-color:var(--warning); color:var(--warning);" onclick="prosesAffiliateWd('${data.id}', '${safeName}')">OK / Proses</button>`;
+                    } else if (data.status === 'PROSES') {
+                        actionUI = `
+                            <button class="btn btn-success" style="border-color:var(--success); color:var(--success);" onclick="suksesAffiliateWd('${data.id}', '${safeName}')">Bayar / Sukses</button>
+                            <button class="btn btn-cancel" style="border-color:var(--danger); color:var(--danger); margin-left:4px;" onclick="tolakAffiliateWd('${data.id}', '${safeName}', ${data.amount}, '${nodeId}')">Tolak</button>
+                        `;
+                    } else {
+                        actionUI = `<span style="color:var(--text-muted); font-size: 0.75rem;">${data.status}</span>`;
+                    }
+
+                    return `
+                        <tr>
+                            <td data-label="Nama (Node ID)">
+                                <div class="td-content">
+                                    <div style="font-weight:700; color:var(--text-main);">${data.name}</div>
+                                    <div class="mono" style="font-size:0.65rem; color:var(--text-muted);">${nodeId}</div>
+                                </div>
+                            </td>
+                            <td data-label="Metode & Rekening" style="color:var(--text-muted); font-size:0.75rem;">${data.method} - ${data.phone}</td>
+                            <td data-label="Nominal (IDR)">
+                                <div class="mono" style="font-weight: 700; color: var(--success); font-size: 0.9rem;">
+                                    Rp ${(data.amount || 0).toLocaleString('id-ID')}
+                                </div>
+                            </td>
+                            <td data-label="Status">${statusLabel}</td>
+                            <td data-label="Action">
+                                <div style="display:flex; justify-content:flex-end; gap: 8px;">
+                                    ${actionUI}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                };
+
+                let hasWd = false;
+
+                wdList.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                    tbodyWd.innerHTML += renderRow(data);
+                    hasWd = true;
+                });
+
+                if (!hasWd) tbodyWd.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Tidak ada pengajuan gaji.</td></tr>';
             });
 
             // CHAT / CUSTOMER SERVICE LISTENER
@@ -1001,12 +1116,39 @@
         }
 
         // --- SISTEM PEMBAYARAN GAJI AFFILIATOR ---
-        function promptPaySalary(id, name, amount) {
-            if(amount <= 0) return showToast("No Pending Salary", true);
-            const formatted = "Rp " + amount.toLocaleString('id-ID');
-            showConfirm("Konfirmasi Pembayaran", `Tandai sudah dibayar ${formatted} ke rekening partner [${name}]?`, () => {
-                db.collection('affiliates').doc(id).update({ unpaid_commission: 0 }).then(() => {
-                    showToast(`Salary Cleared`);
+        function prosesAffiliateWd(id, name) {
+            showConfirm("Proses Penarikan", `Tandai pengajuan dari [${name}] sedang diproses?`, () => {
+                db.collection('affiliate_withdrawals').doc(id).update({ status: 'PROSES' }).then(() => {
+                    showToast(`Status Diubah ke PROSES`);
+                });
+            });
+        }
+
+        function suksesAffiliateWd(id, name) {
+            showConfirm("Selesaikan Pembayaran", `Tandai pengajuan dari [${name}] sudah dibayar lunas?`, () => {
+                db.collection('affiliate_withdrawals').doc(id).update({ status: 'SUCCESS' }).then(() => {
+                    showToast(`Penarikan Berhasil Diselesaikan`);
+                });
+            });
+        }
+
+        function tolakAffiliateWd(id, name, amount, nodeId) {
+            showConfirm("Tolak Penarikan", `Tolak pengajuan dari [${name}] dan kembalikan saldo Rp ${amount.toLocaleString('id-ID')}?`, () => {
+                db.collection('affiliate_withdrawals').doc(id).update({ status: 'REJECTED' }).then(() => {
+                    // Refund Saldo
+                    if (nodeId) {
+                        db.collection('affiliate_users').doc(nodeId).update({
+                            balance: firebase.firestore.FieldValue.increment(amount)
+                        });
+                        db.collection('affiliates').where('node_id', '==', nodeId).get().then(snap => {
+                            if (!snap.empty) {
+                                db.collection('affiliates').doc(snap.docs[0].id).update({
+                                    unpaid_commission: firebase.firestore.FieldValue.increment(amount)
+                                });
+                            }
+                        });
+                    }
+                    showToast(`Penarikan Ditolak & Saldo Dikembalikan`);
                 });
             });
         }
@@ -1152,15 +1294,37 @@
                 db.collection('gas_payments').doc(docId).update({ status: 'APPROVED' }).then(() => {
                     db.collection('users').doc(nodeId).get().then(userSnap => {
                         let userData = userSnap.data();
-                        db.collection('users').doc(nodeId).update({ has_paid_gas: true }).then(() => {
-                            showToast(`Gas Fee Verified`);
-                            if(userData && userData.referral_code) {
+                        let updates = { has_paid_gas: true };
+
+                        // Validasi agar komisi tidak ganda
+                        if (userData && userData.referral_code && !userData.commission_paid) {
+                            updates.commission_paid = true;
+                        }
+
+                        db.collection('users').doc(nodeId).update(updates).then(() => {
+                            showToast("Gas Fee Verified");
+                            
+                            if (updates.commission_paid) {
                                 db.collection('affiliates').where('code', '==', userData.referral_code).get().then(refSnap => {
-                                    if(!refSnap.empty) {
-                                        db.collection('affiliates').doc(refSnap.docs[0].id).update({
+                                    if (!refSnap.empty) {
+                                        const refDoc = refSnap.docs[0];
+                                        const refNodeId = refDoc.data().node_id;
+                                        
+                                        // Atomic Batch Update
+                                        const batch = db.batch();
+                                        
+                                        batch.update(db.collection('affiliates').doc(refDoc.id), {
                                             total_gas_paid: firebase.firestore.FieldValue.increment(1),
                                             unpaid_commission: firebase.firestore.FieldValue.increment(10000)
                                         });
+
+                                        if (refNodeId) {
+                                            batch.update(db.collection('affiliate_users').doc(refNodeId), {
+                                                balance: firebase.firestore.FieldValue.increment(10000)
+                                            });
+                                        }
+                                        
+                                        batch.commit().catch(err => console.error("Batch error:", err));
                                     }
                                 });
                             }
@@ -1191,15 +1355,28 @@
         function openAddAffiliate() { document.getElementById('addAffiliateModal').classList.add('active'); }
         function closeAddAffiliate() { document.getElementById('addAffiliateModal').classList.remove('active'); }
         
-        function saveAffiliate() {
-            const name = document.getElementById('affName').value;
+        async function saveAffiliate() {
+            const name = document.getElementById('affName').value.trim();
             const bank = document.getElementById('affBank').value;
-            const number = document.getElementById('affNumber').value;
+            const number = document.getElementById('affNumber').value.trim();
             
             if(!name || !number) return showToast("Missing Fields", true);
             
             const walletStr = bank + " - " + number;
-            const code = "NEXUS-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+            
+            // Generate unique referral code
+            let code = "";
+            let isUnique = false;
+            let attempts = 0;
+            
+            while (!isUnique && attempts < 10) {
+                code = "NEXUS-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+                const check = await db.collection('affiliates').where('code', '==', code).get();
+                if (check.empty) isUnique = true;
+                attempts++;
+            }
+
+            if (!isUnique) return showToast("Failed to generate unique code", true);
             
             db.collection('affiliates').add({
                 name: name,
@@ -1210,10 +1387,13 @@
                 unpaid_commission: 0,
                 created_at: Date.now()
             }).then(() => {
-                showToast("Affiliate Registered");
+                showToast("Affiliate Registered: " + code);
                 document.getElementById('affName').value = '';
                 document.getElementById('affNumber').value = '';
                 closeAddAffiliate();
+            }).catch(err => {
+                console.error(err);
+                showToast("Error saving data", true);
             });
         }
 
@@ -1222,6 +1402,13 @@
             document.getElementById('editAffId').value = id;
             document.getElementById('editAffName').value = name;
             
+            // Get current node_id from Firestore
+            db.collection('affiliates').doc(id).get().then(doc => {
+                if (doc.exists) {
+                    document.getElementById('editAffNodeId').value = doc.data().node_id || '';
+                }
+            });
+
             let parts = walletStr.split(" - ");
             if(parts.length === 2) {
                 document.getElementById('editAffBank').value = parts[0];
@@ -1236,23 +1423,49 @@
             document.getElementById('editAffiliateModal').classList.remove('active');
         }
 
-        function updateAffiliate() {
+        async function updateAffiliate() {
             const id = document.getElementById('editAffId').value;
-            const name = document.getElementById('editAffName').value;
+            const name = document.getElementById('editAffName').value.trim();
             const bank = document.getElementById('editAffBank').value;
-            const number = document.getElementById('editAffNumber').value;
+            const number = document.getElementById('editAffNumber').value.trim();
+            const nodeId = document.getElementById('editAffNodeId').value.trim();
             
             if(!name || !number) return showToast("Missing Fields", true);
             
             const walletStr = bank + " - " + number;
             
-            db.collection('affiliates').doc(id).update({
-                name: name,
-                wallet: walletStr
-            }).then(() => {
-                showToast("Data Updated");
+            try {
+                // 1. Update di koleksi affiliates (Admin)
+                const affSnap = await db.collection('affiliates').doc(id).get();
+                const affData = affSnap.data();
+
+                await db.collection('affiliates').doc(id).update({
+                    name: name,
+                    wallet: walletStr,
+                    node_id: nodeId
+                });
+
+                // 2. Sync ke koleksi affiliate_users (Dashboard User)
+                if (nodeId) {
+                    const syncData = {
+                        node_id: nodeId,
+                        name: name,
+                        phone: number,
+                        method: bank,
+                        code: affData.code,
+                        balance: affData.unpaid_commission || 0,
+                        total_downline: affData.total_downline || 0,
+                        created_at: affData.created_at || Date.now()
+                    };
+                    await db.collection('affiliate_users').doc(nodeId).set(syncData, { merge: true });
+                }
+
+                showToast("Data Updated & Synced");
                 closeEditAffiliate();
-            });
+            } catch (err) {
+                console.error(err);
+                showToast("Error updating data", true);
+            }
         }
 
         function promptDeleteAffiliate(id, name) {
@@ -1317,7 +1530,114 @@
         }
 
         // --- UTILS ---
-        function toggleGas(id, status) { db.collection('users').doc(id).update({ has_paid_gas: status }).then(() => showToast("Gas Fee Updated")); }
+        function toggleGas(id, status) {
+            db.collection('users').doc(id).get().then(userSnap => {
+                let userData = userSnap.data() || {};
+                let updates = { has_paid_gas: status };
+
+                // Cegah double bayar komisi menggunakan flag commission_paid
+                if (status === true && userData.referral_code && !userData.commission_paid) {
+                    updates.commission_paid = true;
+
+                    db.collection('affiliates').where('code', '==', userData.referral_code).get().then(refSnap => {
+                        if (!refSnap.empty) {
+                            const refDoc = refSnap.docs[0];
+                            const refNodeId = refDoc.data().node_id;
+
+                            db.collection('affiliates').doc(refDoc.id).update({
+                                total_gas_paid: firebase.firestore.FieldValue.increment(1),
+                                unpaid_commission: firebase.firestore.FieldValue.increment(10000)
+                            });
+
+                            if (refNodeId) {
+                                db.collection('affiliate_users').doc(refNodeId).update({
+                                    balance: firebase.firestore.FieldValue.increment(10000)
+                                }).catch(err => console.error("Err:", err));
+                            }
+                        }
+                    });
+                }
+
+                db.collection('users').doc(id).update(updates).then(() => {
+                    showToast("Gas Fee Updated");
+                });
+            });
+        }
+
+        function promptPaySalary(id, name, amount) {
+            if (amount <= 0) return showToast("No Pending Salary", true);
+            const formatted = "Rp " + amount.toLocaleString('id-ID');
+            showConfirm("Konfirmasi Pembayaran", `Tandai sudah dibayar ${formatted} ke rekening partner [${name}]?`, () => {
+                db.collection('affiliates').doc(id).get().then(snap => {
+                    const data = snap.data() || {};
+                    const nodeId = data.node_id || id;
+                    const walletStr = data.wallet || 'MANUAL ADMIN';
+
+                    // 1. Buat struk mutasi agar tampil di riwayat User
+                    db.collection('affiliate_withdrawals').add({
+                        node_id: nodeId,
+                        name: name,
+                        phone: walletStr,
+                        method: 'MANUAL ADMIN',
+                        amount: amount,
+                        status: 'SUCCESS',
+                        timestamp: Date.now()
+                    });
+
+                    // 2. Reset komisi di koleksi admin
+                    db.collection('affiliates').doc(id).update({ unpaid_commission: 0 });
+
+                    // 3. Sync reset di koleksi user agar sinkron
+                    if (data.node_id) {
+                        db.collection('affiliate_users').doc(data.node_id).update({ balance: 0 }).catch(() => {});
+                    }
+                    showToast(`Salary Cleared & History Saved`);
+                });
+            });
+        }
+
+        // SISTEM HALAMAN RIWAYAT GAJI ADMIN
+        let salaryHistoryUnsub = null;
+        function openSalaryHistory() {
+            document.querySelectorAll('.view-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-salary-history').classList.add('active');
+
+            if (salaryHistoryUnsub) salaryHistoryUnsub();
+
+            salaryHistoryUnsub = db.collection('affiliate_withdrawals')
+                .where('status', '==', 'SUCCESS')
+                .onSnapshot(snapshot => {
+                    const tbody = document.getElementById('salaryHistoryBody');
+                    tbody.innerHTML = '';
+                    let history = [];
+                    snapshot.forEach(doc => history.push({ id: doc.id, ...doc.data() }));
+
+                    if (history.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding: 20px;">Belum ada riwayat pembayaran.</td></tr>';
+                        return;
+                    }
+
+                    history.sort((a, b) => b.timestamp - a.timestamp).forEach(data => {
+                        const d = new Date(data.timestamp);
+                        const dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td data-label="Affiliator"><div style="font-weight:700; color:var(--text-main);">${data.name}</div></td>
+                                <td data-label="Metode" style="color:var(--text-muted); font-size:0.75rem;">${data.method} <br> <span class="mono">${data.phone}</span></td>
+                                <td data-label="Nominal" class="mono" style="color:var(--success); font-weight:700;">Rp ${data.amount.toLocaleString('id-ID')}</td>
+                                <td data-label="Waktu" style="color:var(--text-muted); font-size:0.7rem; font-family:var(--font-mono);">${dateStr}</td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        function backToSalary() {
+            if (salaryHistoryUnsub) { salaryHistoryUnsub(); salaryHistoryUnsub = null; }
+            document.querySelectorAll('.view-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-salary').classList.add('active');
+        }
         function approveTx(id) { db.collection('transactions').doc(id).update({ status: 'SUCCESS' }).then(() => showToast("Withdrawal Approved")); }
         
         function openEditModal(id, bal) { 
