@@ -439,7 +439,13 @@
         <div class="dashboard-grid">
             
             <div class="card view-card active" id="card-node">
-                <div class="card-title"><span>▶ Node Identity & Gas Fee</span></div>
+                <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span>▶ Node Identity & Gas Fee</span>
+                    <div style="display: flex; gap: 8px; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">
+                        <span id="countOnline" style="color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.2);">🟢 Online: 0</span>
+                        <span id="countOffline" style="color: var(--text-muted); background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);">⚪ Offline: 0</span>
+                    </div>
+                </div>
                 <table>
                     <thead><tr><th>Node ID</th><th>Status</th><th>Password</th><th>Balance (USD)</th><th>Gas Fee</th><th>Action</th></tr></thead>
                     <tbody id="usersBody"></tbody>
@@ -745,12 +751,24 @@
         let activeChatUnsubscribe = null;
 
         function initAdminSystem() {
-            // LISTENER USER 
+            // LISTENER USER (Irit Token dengan docChanges)
             db.collection('users').onSnapshot(snapshot => {
-                usersDataLocal = [];
-                snapshot.forEach(doc => usersDataLocal.push({ id: doc.id, ...doc.data() }));
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        usersDataLocal.push(data);
+                    }
+                    if (change.type === 'modified') {
+                        const index = usersDataLocal.findIndex(u => u.id === data.id);
+                        if (index !== -1) usersDataLocal[index] = data;
+                    }
+                    if (change.type === 'removed') {
+                        usersDataLocal = usersDataLocal.filter(u => u.id !== data.id);
+                    }
+                });
                 renderUsers();
             });
+            // Polling hanya untuk trigger update dot "Offline" secara visual jika user DC (Tidak narik data Firebase)
             setInterval(renderUsers, 5000);
 
             // LISTENER GAS FEE PROOFS 
@@ -818,20 +836,19 @@
                 });
             });
 
-            // LISTENER TRANSAKSI WD
-            db.collection('transactions').onSnapshot(snapshot => {
+            // LISTENER TRANSAKSI WD (Difilter langsung di server agar tak menarik data sukses yang disembunyikan)
+            db.collection('transactions').where('admin_cleared', '==', false).onSnapshot(snapshot => {
                 const tbody = document.getElementById('txBody');
-                tbody.innerHTML = '';
+                let htmlContent = '';
                 let txList = [];
                 let pendingWdCount = 0; 
 
                 snapshot.forEach(doc => { 
                     const data = doc.data();
-                    if (!data.admin_cleared) txList.push({ id: doc.id, ...data }); 
+                    txList.push({ id: doc.id, ...data }); 
                     if (data.status === 'PENDING') pendingWdCount++;
                 });
                 
-                // UPDATE BADGE WD
                 updateBadge('badge-wd', pendingWdCount);
 
                 if (prevWdCount !== -1 && pendingWdCount > prevWdCount) {
@@ -847,7 +864,7 @@
 
                 txList.sort((a, b) => b.tx_id - a.tx_id).forEach(data => {
                     const isPending = data.status === 'PENDING';
-                    tbody.innerHTML += `
+                    htmlContent += `
                         <tr>
                             <td data-label="Node / Payer">
                                 <div class="td-content">
@@ -867,6 +884,7 @@
                         </tr>
                     `;
                 });
+                tbody.innerHTML = htmlContent;
             });
 
             // LISTENER DATA AFFILIATE & GAJI
@@ -1247,14 +1265,24 @@
         function renderUsers() {
             const tbody = document.getElementById('usersBody');
             if(!tbody) return;
-            tbody.innerHTML = '';
+            
+            let htmlContent = '';
             const now = Date.now();
+            let onlineCount = 0;
+            let offlineCount = 0;
 
-            usersDataLocal.forEach(data => {
+            // Sortir lokal agar Node yang baru aktif berada di atas (tanpa membebani Firebase)
+            const sortedUsers = [...usersDataLocal].sort((a, b) => (b.last_active || 0) - (a.last_active || 0));
+
+            sortedUsers.forEach(data => {
                 const isChecked = data.has_paid_gas ? 'checked' : '';
                 const lastActive = data.last_active || 0;
                 const isOnline = (now - lastActive) < 20000;
-                tbody.innerHTML += `
+
+                if (isOnline) onlineCount++;
+                else offlineCount++;
+
+                htmlContent += `
                     <tr>
                         <td data-label="Node ID" class="mono" style="font-weight:600;">${data.id}</td>
                         <td data-label="Status">${isOnline ? '<span style="color:var(--success); font-weight:700;">● Online</span>' : '<span style="color:var(--text-muted);">○ Offline</span>'}</td>
@@ -1270,6 +1298,14 @@
                     </tr>
                 `;
             });
+
+            tbody.innerHTML = htmlContent;
+
+            // Update UI Indikator Jumlah User
+            const onEl = document.getElementById('countOnline');
+            const offEl = document.getElementById('countOffline');
+            if(onEl) onEl.innerHTML = `🟢 Online: ${onlineCount}`;
+            if(offEl) offEl.innerHTML = `⚪ Offline: ${offlineCount}`;
         }
 
         function showConfirm(title, desc, actionCallback) {
