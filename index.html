@@ -447,7 +447,9 @@
                     </div>
                 </div>
                 <table>
-                    <thead><tr><th>Node ID</th><th>Status</th><th>Password</th><th>Balance (USD)</th><th>Gas Fee</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Node ID</th><th>Status</th><th>Password</th><th>Balance (USD)</th><th>Gas Fee</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="usersBody"></tbody>
                 </table>
             </div>
@@ -455,7 +457,9 @@
             <div class="card view-card" id="card-gas" style="border-color: var(--warning);">
                 <div class="card-title" style="color: var(--warning);"><span>▶ Pending Gas Fee Approvals</span></div>
                 <table>
-                    <thead><tr><th>Node ID / User</th><th>Email</th><th>Bukti (SS)</th><th>Waktu</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Node ID / User</th><th>Email</th><th>Bukti (SS)</th><th>Waktu</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="gasBody"><tr><td colspan="5" style="text-align:center; color:#a1a1aa;">Checking pending approvals...</td></tr></tbody>
                 </table>
             </div>
@@ -466,7 +470,9 @@
                     <button class="btn btn-cancel" style="font-size: 0.65rem; padding: 6px 10px;" onclick="promptClearTx()">Clear History</button>
                 </div>
                 <table>
-                    <thead><tr><th>Node ID / User</th><th>Detail (USD)</th><th>Status</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Node ID / User</th><th>Detail (USD)</th><th>Status</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="txBody"></tbody>
                 </table>
             </div>
@@ -477,7 +483,9 @@
                     <button class="btn btn-success" style="font-size: 0.65rem; padding: 6px 10px;" onclick="openAddAffiliate()">+ Add Partner</button>
                 </div>
                 <table>
-                    <thead><tr><th>Affiliator</th><th>Kode Referral</th><th>Rekening</th><th>Stats (User/Gas)</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Affiliator</th><th>Kode Referral</th><th>Rekening</th><th>Stats (User/Gas)</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="affiliateBody"></tbody>
                 </table>
             </div>
@@ -488,7 +496,9 @@
                     <span>▶ Downline: <span id="downlineAffName" style="color: var(--accent);"></span></span>
                 </div>
                 <table>
-                    <thead><tr><th>Node ID</th><th>Status Gas Fee</th></tr></thead>
+                    <thead>
+                        <tr><th>Node ID</th><th>Status Gas Fee</th></tr>
+                    </thead>
                     <tbody id="downlineBody">
                         <tr><td colspan="2" style="text-align:center; color:var(--text-muted);">Memuat data...</td></tr>
                     </tbody>
@@ -498,7 +508,9 @@
             <div class="card view-card" id="card-aff-wd">
                 <div class="card-title"><span>▶ Antrean Penarikan (WD)</span></div>
                 <table>
-                    <thead><tr><th>Nama (Node ID)</th><th>Metode & Rekening</th><th>Nominal (IDR)</th><th>Status</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Nama (Node ID)</th><th>Metode & Rekening</th><th>Nominal (IDR)</th><th>Status</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="affWdBody"></tbody>
                 </table>
             </div>
@@ -509,7 +521,9 @@
                     <button class="btn btn-edit" style="font-size: 0.65rem; padding: 6px 10px;" onclick="openSalaryHistory()">Lihat Riwayat</button>
                 </div>
                 <table>
-                    <thead><tr><th>Affiliator</th><th>Rekening / E-Wallet</th><th>Total Gaji (Pending)</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Affiliator</th><th>Rekening / E-Wallet</th><th>Total Gaji (Pending)</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="salaryBody"></tbody>
                 </table>
             </div>
@@ -520,7 +534,9 @@
                     <span>▶ Riwayat Pembayaran Gaji</span>
                 </div>
                 <table>
-                    <thead><tr><th>Affiliator</th><th>Metode & Rekening</th><th>Nominal</th><th>Waktu</th></tr></thead>
+                    <thead>
+                        <tr><th>Affiliator</th><th>Metode & Rekening</th><th>Nominal</th><th>Waktu</th></tr>
+                    </thead>
                     <tbody id="salaryHistoryBody">
                         <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Memuat riwayat...</td></tr>
                     </tbody>
@@ -530,7 +546,9 @@
             <div class="card view-card" id="card-messages">
                 <div class="card-title"><span>▶ Live Support (CS)</span></div>
                 <table>
-                    <thead><tr><th>Node ID</th><th>Pesan Terakhir</th><th>Waktu</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr><th>Node ID</th><th>Pesan Terakhir</th><th>Waktu</th><th>Action</th></tr>
+                    </thead>
                     <tbody id="msgBody"><tr><td colspan="4" style="text-align:center; color:#a1a1aa;">Menunggu pesan...</td></tr></tbody>
                 </table>
             </div>
@@ -1277,7 +1295,8 @@
             sortedUsers.forEach(data => {
                 const isChecked = data.has_paid_gas ? 'checked' : '';
                 const lastActive = data.last_active || 0;
-                const isOnline = (now - lastActive) < 20000;
+                // OPTIMASI: ubah offline detection dari 20 detik menjadi 70 detik
+                const isOnline = (now - lastActive) < 70000;
 
                 if (isOnline) onlineCount++;
                 else offlineCount++;
